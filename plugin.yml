@@ -1,0 +1,10 @@
+name: TestGrounds
+main: me.desty.plugin.main
+version: 1.00.0
+author: d3sty
+description: Desty's Test Grounds!
+commands:
+  tntslap:
+    aliases: ts
+    description: stuff.
+    usage: /<command>

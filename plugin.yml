@@ -1,8 +1,8 @@
-name: TestGrounds
-main: me.desty.plugin.main
+name: TnTSlap
+main: com.Nips.TnTSlap.TnTSlap
 version: 1.00.0
-author: d3sty
-description: Desty's Test Grounds!
+author: d3sty & Kunta
+description: Gold old slap game, with a twist.
 commands:
   tntslap:
     aliases: ts

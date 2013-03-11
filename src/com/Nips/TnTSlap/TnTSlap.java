@@ -1,24 +1,27 @@
 package com.Nips.TnTSlap;
 
-import java.util.ArrayList;
-
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.Nips.TnTSlap.Commands.TnTSlapCommand;
+import com.Nips.TnTSlap.Listeners.PlayerMoveListener;
+
 public class TnTSlap extends JavaPlugin {
 	/* ///// ArrayLists & HashMaps ///// */
-	ArrayList<Player> PlayersInGame = new ArrayList<Player>();
 
 	/* ///// Booleans ///// */
 	public boolean gameInSession;
 
 	/* ///// Integers and Strings ///// */
 
+	TnTSlapCommand SlapCommand = new TnTSlapCommand(this);
+
 	@Override
 	public void onEnable() {
 		getLogger().info("Enabled");
 		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvents(new PlayerMoveListener(), this);
+		this.getCommand("tntslap").setExecutor(SlapCommand);
 	}
 
 	@Override

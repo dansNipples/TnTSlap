@@ -1,20 +1,26 @@
-package com.Nips.TnTSlap.Listeners;
+package com.Nips.TnTSlap.Listeners.Entities;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import com.Nips.TnTSlap.GameData;
 import com.Nips.TnTSlap.PlayerManager;
 
 public class PlayerMoveListener implements Listener {
-	private final PlayerManager pm = new PlayerManager();
+	PlayerManager pm;
+	GameData game;
 
 	@EventHandler
 	public void PlayerMove(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
 		if (player.getLocation().getY() < -5) {
-
+			// pm.PlayerFell(player);
+			if (game.getLastToHit(player.getDisplayName()) != null) {
+				player.getServer().broadcastMessage("xD");
+			} else
+				return;
 		}
 	}
 }

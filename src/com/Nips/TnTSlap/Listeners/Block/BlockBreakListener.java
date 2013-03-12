@@ -1,4 +1,4 @@
-package com.Nips.TnTSlap.Listeners;
+package com.Nips.TnTSlap.Listeners.Block;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

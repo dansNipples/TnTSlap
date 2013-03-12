@@ -23,6 +23,7 @@ public class TnTSlapCommand implements CommandExecutor {
 		if (args.length > 0) {
 			if (args[0].equalsIgnoreCase("join")) {
 				playermanager.addPlayerToGame(player);
+
 			}
 		} else
 			return false;

@@ -7,12 +7,6 @@ import com.Nips.TnTSlap.Commands.TnTSlapCommand;
 import com.Nips.TnTSlap.Listeners.PlayerMoveListener;
 
 public class TnTSlap extends JavaPlugin {
-	/* ///// ArrayLists & HashMaps ///// */
-
-	/* ///// Booleans ///// */
-	public boolean gameInSession;
-
-	/* ///// Integers and Strings ///// */
 
 	TnTSlapCommand SlapCommand = new TnTSlapCommand(this);
 

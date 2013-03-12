@@ -9,8 +9,8 @@ import com.Nips.TnTSlap.GameData;
 import com.Nips.TnTSlap.PlayerManager;
 
 public class PlayerMoveListener implements Listener {
-	PlayerManager pm;
-	GameData game;
+	PlayerManager pm = new PlayerManager();
+	GameData game = new GameData();
 
 	@EventHandler
 	public void PlayerMove(PlayerMoveEvent event) {

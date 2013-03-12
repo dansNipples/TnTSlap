@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 public class PlayerManager {
 
-	GameData game;
+	GameData game = new GameData();
 
 	public void addPlayerToGame(Player player) {
 		game.PlayersInGame.add(player);
@@ -17,13 +17,14 @@ public class PlayerManager {
 	}
 
 	public void PlayerFell(Player faller) {
-		if (game.getLastToHit(faller) != null) {
+		if (game.getLastToHit(faller) == null) {
 			faller.getServer().broadcastMessage(ChatColor.RED + faller.getDisplayName() + ChatColor.YELLOW + " Slipped!");
 
 		} else {
 			String a = (ChatColor.GREEN + game.getLastToHit(faller).getDisplayName() + "[" + game.Getkills(game.getLastToHit(faller)) + "]");
 			String b = (ChatColor.RED + faller.getDisplayName() + "[" + game.Getkills(faller) + "]");
-			faller.getServer().broadcastMessage(ChatColor.YELLOW + "K0'd" + b);
+			faller.getServer().broadcastMessage(a + ChatColor.YELLOW + " K0'd " + b);
+
 		}
 
 		faller.teleport(faller.getWorld().getSpawnLocation());

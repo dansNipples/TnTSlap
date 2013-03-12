@@ -23,8 +23,8 @@ public class PlayerManager {
 		} else {
 			String a = (ChatColor.GREEN + game.getLastToHit(faller).getDisplayName() + "[" + game.Getkills(game.getLastToHit(faller)) + "]");
 			String b = (ChatColor.RED + faller.getDisplayName() + "[" + game.Getkills(faller) + "]");
-			faller.getServer().broadcastMessage(a + ChatColor.YELLOW + " K0'd " + b);
-
+			faller.getServer().broadcastMessage(ChatColor.GREEN + a + ChatColor.YELLOW + " K0'd " + ChatColor.RED + b);
+			addKill(game.getLastToHit(faller));
 		}
 
 		faller.teleport(faller.getWorld().getSpawnLocation());

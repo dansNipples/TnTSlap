@@ -17,11 +17,11 @@ public class PlayerManager {
 	}
 
 	public void PlayerFell(Player faller) {
-		if (game.getLastToHit(faller.getDisplayName()) != null) {
+		if (game.getLastToHit(faller) != null) {
 			faller.getServer().broadcastMessage(ChatColor.RED + faller.getDisplayName() + ChatColor.YELLOW + " Slipped!");
 
 		} else {
-			// String a = (ChatColor.GREEN + game.getLastToHit(faller.getDisplayName()) + "[" + game.Getkills(game.getLastToHit(faller)) + "]");
+			String a = (ChatColor.GREEN + game.getLastToHit(faller).getDisplayName() + "[" + game.Getkills(game.getLastToHit(faller)) + "]");
 			String b = (ChatColor.RED + faller.getDisplayName() + "[" + game.Getkills(faller) + "]");
 			faller.getServer().broadcastMessage(ChatColor.YELLOW + "K0'd" + b);
 		}
@@ -31,7 +31,7 @@ public class PlayerManager {
 
 	public void ChangeLastAtked(Player target, Player attacker) {
 		game.lastToHit.remove(target.getDisplayName());
-		game.lastToHit.put(target.getDisplayName(), attacker.getDisplayName());
+		game.lastToHit.put(target, attacker);
 
 		// new BukkitRunnable() {
 		// public void run() {

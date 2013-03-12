@@ -10,13 +10,13 @@ public class GameData {
 	public ArrayList<Player> PlayersInGame = new ArrayList<Player>();
 
 	public Map<Player, Integer> Kills = new HashMap<Player, Integer>();
-	public Map<String, String> lastToHit = new HashMap<String, String>();
+	public Map<Player, Player> lastToHit = new HashMap<Player, Player>();
 
 	public int Getkills(Player p) {
 		return Kills.get(p);
 	}
 
-	public String getLastToHit(String s) {
-		return lastToHit.get(s);
+	public Player getLastToHit(Player p) {
+		return lastToHit.get(p);
 	}
 }

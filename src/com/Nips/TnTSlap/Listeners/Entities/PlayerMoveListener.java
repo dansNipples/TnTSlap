@@ -16,11 +16,7 @@ public class PlayerMoveListener implements Listener {
 	public void PlayerMove(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
 		if (player.getLocation().getY() < -5) {
-			// pm.PlayerFell(player);
-			if (game.getLastToHit(player.getDisplayName()) != null) {
-				player.getServer().broadcastMessage("xD");
-			} else
-				return;
+			pm.PlayerFell(player);
 		}
 	}
 }

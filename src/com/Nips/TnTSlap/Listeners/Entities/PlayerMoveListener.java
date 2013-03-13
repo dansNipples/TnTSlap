@@ -15,8 +15,10 @@ public class PlayerMoveListener implements Listener {
 	@EventHandler
 	public void PlayerMove(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
-		if (player.getLocation().getY() < -5) {
+		if (player.getLocation().getY() < -5 && GameData.PlayersInGame.contains(player)) {
+			player.teleport(player.getWorld().getSpawnLocation());
 			pm.PlayerFell(player);
+			player.setFallDistance(0f);
 		}
 	}
 }

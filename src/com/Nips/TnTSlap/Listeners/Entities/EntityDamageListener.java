@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.Nips.TnTSlap.GameData;
 import com.Nips.TnTSlap.PlayerManager;
@@ -14,6 +15,11 @@ import com.Nips.TnTSlap.PlayerManager;
 public class EntityDamageListener implements Listener {
 	PlayerManager pm = new PlayerManager();
 	GameData game = new GameData();
+
+	@EventHandler
+	public void PlayerJoined(PlayerJoinEvent event) {
+		pm.addPlayerToGame(event.getPlayer());
+	}
 
 	@EventHandler
 	public void EntityDamaged(EntityDamageEvent event) {
@@ -32,7 +38,11 @@ public class EntityDamageListener implements Listener {
 	}
 
 	@EventHandler
-	public void PlayerHungered(FoodLevelChangeEvent event) {
-		event.setCancelled(true);
+	public void HungerEvent(FoodLevelChangeEvent event) {
+		if (event.getEntityType() == EntityType.PLAYER) {
+			Player p = (Player) event.getEntity();
+			p.setSaturation(20.0f);
+			event.setCancelled(true);
+		}
 	}
 }

@@ -12,11 +12,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.Nips.TnTSlap.Commands.SetLobbyCommand;
 import com.Nips.TnTSlap.Commands.TnTSlapCommand;
-import com.Nips.TnTSlap.Listeners.Block.BlockBreakListener;
-import com.Nips.TnTSlap.Listeners.Block.SignChangeListener;
-import com.Nips.TnTSlap.Listeners.Entities.EntityDamageListener;
-import com.Nips.TnTSlap.Listeners.Entities.PlayerInteractListener;
-import com.Nips.TnTSlap.Listeners.Entities.PlayerMoveListener;
+import com.Nips.TnTSlap.Listeners.BlockListener;
+import com.Nips.TnTSlap.Listeners.EntityListener;
 
 public class TnTSlap extends JavaPlugin {
 	/** Sign Configuration **/
@@ -25,18 +22,22 @@ public class TnTSlap extends JavaPlugin {
 	/** Command Classes Implementation **/
 	TnTSlapCommand SlapCommand = new TnTSlapCommand(this);
 	SetLobbyCommand ArenaCommand = new SetLobbyCommand(this);
+	/** Classes to register **/
+	PlayerManager pm = new PlayerManager(this);
+	GameManager gameManager = new GameManager(this);
+	Timer time = new Timer(this);
+	/** Listeners **/
+	EntityListener entitylistener = new EntityListener(this);
+	BlockListener blocklistener = new BlockListener(this);
 
-	/** Configuration Classes Implementation **/
 	@Override
 	public void onEnable() {
 		PluginManager pm = getServer().getPluginManager();
 		FileConfiguration config = this.getArenaConfig();
 		/** Event Registration **/
-		pm.registerEvents(new PlayerMoveListener(), this);
-		pm.registerEvents(new PlayerInteractListener(), this);
-		pm.registerEvents(new BlockBreakListener(), this);
-		pm.registerEvents(new SignChangeListener(this), this);
-		pm.registerEvents(new EntityDamageListener(), this);
+		pm.registerEvents(entitylistener, this);
+		pm.registerEvents(blocklistener, this);
+
 		/** Command Registration **/
 		this.getCommand("tntslap").setExecutor(SlapCommand);
 		this.getCommand("setarena").setExecutor(ArenaCommand);

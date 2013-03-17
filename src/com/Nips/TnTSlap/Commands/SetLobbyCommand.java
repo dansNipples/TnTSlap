@@ -20,21 +20,18 @@ public class SetLobbyCommand implements CommandExecutor {
             // plugin.lobby_join = player.getLocation();;
             if(player.isOp() == true){
                 if (args.length == 0) {
+                		int i = plugin.getArenaConfig().getInt("Arenas.ArenaCount");
+                        plugin.getArenaConfig().set("Arenas." + i, "");
+                        plugin.saveArenaConfig();
+                        player.sendMessage(ChatColor.YELLOW + "X: " + Math.round(player.getLocation().getX()));
+                        player.sendMessage(ChatColor.YELLOW + "Y: " + Math.round(player.getLocation().getY()));
+                        player.sendMessage(ChatColor.YELLOW + "Z: " + Math.round(player.getLocation().getZ()));
+                        player.sendMessage(ChatColor.YELLOW + "Yaw: " + player.getLocation().getYaw());
+                        player.sendMessage(ChatColor.YELLOW + "Pitch: " + player.getLocation().getPitch());
+                        player.sendMessage(ChatColor.RED + "Arena: " + ChatColor.YELLOW + args[0] + ChatColor.RED + " has been set!");
                         return true;
                 }
                 if (args.length > 0) {
-                		if(args.length == 1){
-                			if(!plugin.getArenaConfig().contains(args[0])){
-                                plugin.getArenaConfig().set("Arenas." + args[0], "");
-                                plugin.saveArenaConfig();
-                                player.sendMessage(ChatColor.YELLOW + "X: " + Math.round(player.getLocation().getX()));
-                                player.sendMessage(ChatColor.YELLOW + "Y: " + Math.round(player.getLocation().getY()));
-                                player.sendMessage(ChatColor.YELLOW + "Z: " + Math.round(player.getLocation().getZ()));
-                                player.sendMessage(ChatColor.YELLOW + "Yaw: " + player.getLocation().getYaw());
-                                player.sendMessage(ChatColor.YELLOW + "Pitch: " + player.getLocation().getPitch());
-                                player.sendMessage(ChatColor.RED + "Arena: " + ChatColor.YELLOW + args[0] + ChatColor.RED + " has been set!");
-                			}
-                		}
                 		if(args.length == 2){
                 			try {
 	                            int j = plugin.getArenaConfig().getInt("Arenas.MaxArenaPoints");

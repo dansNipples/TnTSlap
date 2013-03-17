@@ -42,11 +42,6 @@ public class BlockListener implements Listener {
 		if (event.getLine(0).equalsIgnoreCase("tntjoin")) {
 			event.setLine(0, "§a[TNTSLAP]");
 			event.setLine(1, "§nJoin Game");
-			if (plugin.getArenaConfig().contains("Arenas." + event.getLine(2))) {
-				player.sendMessage(ChatColor.RED + "Arena is invalid!");
-				event.setLine(3, "§4" + event.getLine(2));
-			}
-			event.setLine(3, "Players 0/20");
 			player.sendMessage(ChatColor.GREEN + "Join Sign Registered!");
 		}
 		if (event.getLine(0).equalsIgnoreCase("tntleave")) {

@@ -5,6 +5,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.Nips.TnTSlap.Functions.SpawnFunction;
+
 public class GameManager {
 	private static TnTSlap plugin;
 
@@ -26,13 +28,14 @@ public class GameManager {
 	}
 
 	public static void startGame() {
-		Bukkit.getServer().broadcastMessage(ChatColor.LIGHT_PURPLE + "game starting..");
+		// Bukkit.getServer().broadcastMessage(ChatColor.LIGHT_PURPLE + "game starting..");
 		GameData.setPvp(true);
 		GameData.setGameSession(true);
 		for (Player p : GameData.PlayersInGame) {
-			p.teleport(Bukkit.getServer().getWorld("world").getSpawnLocation()); // change to picking random spot
 			PlayerManager.setupInv(p);
+			SpawnFunction.SpawnPlayer(p);
 		}
+
 	}
 
 	public static void resetGame() {

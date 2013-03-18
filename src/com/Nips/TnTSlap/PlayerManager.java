@@ -1,10 +1,7 @@
 package com.Nips.TnTSlap;
 
-import net.minecraft.server.v1_4_R1.Packet62NamedSoundEffect;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_4_R1.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -46,8 +43,8 @@ public class PlayerManager {
 		int i = GameData.Getkills(attacker);
 		GameData.Kills.put(attacker, i + 1);
 		Location loc = attacker.getLocation();
-		Packet62NamedSoundEffect packet = new Packet62NamedSoundEffect("random.anvil_land", loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), 0.2F, 0.9F);
-		((CraftPlayer) attacker).getHandle().playerConnection.sendPacket(packet);
+		// Packet62NamedSoundEffect packet = new Packet62NamedSoundEffect("random.anvil_land", loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), 0.2F, 0.9F);
+		// ((CraftPlayer) attacker).getHandle().playerConnection.sendPacket(packet);
 		if (GameData.Getkills(attacker) >= 5) {
 			attacker.getServer().broadcastMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + attacker.getName() + ChatColor.LIGHT_PURPLE + " Won The Game");
 			GameManager.endGame();

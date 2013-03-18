@@ -8,8 +8,7 @@ commands:
     aliases: ts
     description: stuff.
     usage: /<command>
-  setarena:
-    aliases: sa
+  arena:
+    aliases: a
     description: stuff.
     usage: /<command>
-#fdjksafda

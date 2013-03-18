@@ -24,7 +24,6 @@ import org.bukkit.util.Vector;
 import com.Nips.TnTSlap.GameData;
 import com.Nips.TnTSlap.PlayerManager;
 import com.Nips.TnTSlap.TnTSlap;
-import com.Nips.TnTSlap.Functions.SpawnFunction;
 
 public class EntityListener implements Listener {
 	private TnTSlap plugin;
@@ -93,9 +92,9 @@ public class EntityListener implements Listener {
 				Sign sign = (Sign) block.getState();
 				if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 					if (sign.getLine(0).equals("§a[TNTSLAP]") && sign.getLine(1).equals("§nJoin Game")) {
-						player.sendMessage(ChatColor.YELLOW + "Joined Game(theoretically)");
+						player.sendMessage(ChatColor.YELLOW + "Joined Game");
 						PlayerManager.addPlayerToGame(player);
-						SpawnFunction.getSpawnPoints(sign.getLine(2));
+						// SpawnFunction.getSpawnPoints(sign.getLine(2)); // check if game is started or not, otherwise runs through gamestart
 					}
 					if (sign.getLine(0).equals("§a[TNTSLAP]") && sign.getLine(1).equals("§nLeave Game")) {
 						player.sendMessage(ChatColor.YELLOW + "Left Game(theoretically)");

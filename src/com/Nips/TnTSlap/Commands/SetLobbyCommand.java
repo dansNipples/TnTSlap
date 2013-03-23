@@ -6,21 +6,14 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.Nips.TnTSlap.ArenaConfig;
-import com.Nips.TnTSlap.TnTSlap;
+import com.Nips.TnTSlap.Config.ArenaConfig;
 
 public class SetLobbyCommand implements CommandExecutor {
-	private TnTSlap plugin;
-
-	public SetLobbyCommand(TnTSlap plugin) {
-		this.plugin = plugin;
-	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		Player player = (Player) sender;
 
-		// plugin.lobby_join = player.getLocation();;
 		if (player.isOp() == true) {
 			if (args.length == 0) {
 				// player.sendMessage(ChatColor.LIGHT_PURPLE + "  ======  " + ChatColor.YELLOW + "" + ChatColor.BOLD + "Arena Commands" + ChatColor.LIGHT_PURPLE + "  ======  ");
@@ -35,6 +28,14 @@ public class SetLobbyCommand implements CommandExecutor {
 						ArenaConfig.CreateArena(args[1], player.getName());
 					} else
 						player.sendMessage(ChatColor.RED + "Try /arena create <ArenaName>");
+				}
+
+				if (args[0].equalsIgnoreCase("delete")) {
+					if (args.length > 1) {
+						// ArenaConfig.DeleteArena(args[1], player);
+						player.sendMessage(ChatColor.RED + "Try /arena delete <ArenaName> <--- currently not working, edit arenas.yml manually");
+					} else
+						player.sendMessage(ChatColor.RED + "Try /arena delete <ArenaName> <--- currently not working, edit arenas.yml manually");
 				}
 
 				if (args[0].equalsIgnoreCase("setpoint")) {

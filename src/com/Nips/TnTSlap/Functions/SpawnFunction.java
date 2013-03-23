@@ -7,14 +7,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import com.Nips.TnTSlap.ArenaConfig;
+import com.Nips.TnTSlap.Config.ArenaConfig;
+import com.Nips.TnTSlap.Utils.GameData;
 
 public class SpawnFunction {
 	public static void SpawnPlayer(Player p) {
-		String point = grabRandomPoint("dansnipple");
+		String point = grabRandomPoint(GameData.CurrentMap);
 		if (point == null) {
-			// repick map
-			Bukkit.getServer().broadcastMessage("uh oh..  Messed up finding map points!");
+			p.teleport(p.getWorld().getSpawnLocation());
 			return;
 		}
 		String[] s = point.split(":");
@@ -25,11 +25,12 @@ public class SpawnFunction {
 	}
 
 	public static String grabRandomPoint(String MapName) {
-		if (!ArenaConfig.getArenaConfig().contains(MapName)) {
+		if (!ArenaConfig.getArenaConfig().contains(MapName) || GameData.CurrentMap == null) {
 			return null;
 		}
 
 		Set<String> points = ArenaConfig.getArenaConfig().getConfigurationSection(MapName).getKeys(false);
+
 		Random rand = new Random();
 		Integer i = rand.nextInt(points.size() + 1);
 		if (i == 0) {
@@ -39,7 +40,4 @@ public class SpawnFunction {
 		return s;
 	}
 
-	public static String grabRandomMap() {
-		return "1";
-	}
 }

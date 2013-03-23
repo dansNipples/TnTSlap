@@ -1,4 +1,4 @@
-package com.Nips.TnTSlap;
+package com.Nips.TnTSlap.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +10,10 @@ public class GameData {
 	public static ArrayList<Player> PlayersInGame = new ArrayList<Player>();
 	public static Map<Player, Integer> Kills = new HashMap<Player, Integer>();
 	public static Map<Player, Player> lastToHit = new HashMap<Player, Player>();
+	public static String CurrentMap;
+	public static String NextMap;
 	public static boolean Started;
+	public static boolean Counting;
 	public static boolean Pvp;
 
 	public static int Getkills(Player p) {
@@ -43,6 +46,14 @@ public class GameData {
 
 	public static int getPlayerSize() {
 		return PlayersInGame.size();
+	}
+
+	public static String getCurrentMap() {
+		return CurrentMap;
+	}
+
+	public static String getNextMap() {
+		return NextMap;
 	}
 
 }

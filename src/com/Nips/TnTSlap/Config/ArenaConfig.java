@@ -1,4 +1,4 @@
-package com.Nips.TnTSlap;
+package com.Nips.TnTSlap.Config;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,11 +13,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
+import com.Nips.TnTSlap.TnTSlap;
+
 public class ArenaConfig {
 	private static TnTSlap plugin;
 
 	public ArenaConfig(TnTSlap plugin) {
-		this.plugin = plugin;
+		ArenaConfig.plugin = plugin;
 	}
 
 	private static FileConfiguration arenaConfig = null;
@@ -25,6 +27,17 @@ public class ArenaConfig {
 
 	public static void CreateArena(String Name, String CreatorName) {
 		getArenaConfig().set(Name, "Made by: " + CreatorName);
+		saveArenaConfig();
+	}
+
+	public static void DeleteArena(String Name, Player p) {
+		Set<String> keys = getArenaConfig().getKeys(false);
+		if (!keys.contains(Name) || !getArenaConfig().contains(Name)) {
+			p.sendMessage(ChatColor.RED + "No such arena name!");
+			return;
+		}
+		keys.remove(Name);
+		// getArenaConfig().getKeys(false).addAll(keys);
 		saveArenaConfig();
 	}
 

@@ -6,10 +6,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Type;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.inventory.meta.FireworkMeta;
+
+import com.Nips.TnTSlap.Functions.SpawnFunction;
+import com.Nips.TnTSlap.Utils.GameData;
 
 public class Timer implements Runnable {
 	private TnTSlap plugin;
@@ -42,6 +46,7 @@ public class Timer implements Runnable {
 	public void run() {
 		if (j < 10) {
 			fireworks(Bukkit.getServer().getWorld("world"));
+			fireworks(Bukkit.getServer().getWorld("world"));
 			j++;
 		} else {
 			j = 0;
@@ -51,8 +56,10 @@ public class Timer implements Runnable {
 	}
 
 	public void fireworks(final World world) {
-		//
-		Firework fw = (Firework) world.spawnEntity(world.getSpawnLocation(), EntityType.FIREWORK);
+		String s = SpawnFunction.grabRandomPoint(GameData.getCurrentMap());
+		String[] pos = s.split(":");
+		Location loc = new Location(world, Double.parseDouble(pos[0]), Double.parseDouble(pos[1]), Double.parseDouble(pos[2]));
+		Firework fw = (Firework) world.spawnEntity(loc, EntityType.FIREWORK);
 		FireworkMeta fwm = fw.getFireworkMeta();
 
 		Random r = new Random();

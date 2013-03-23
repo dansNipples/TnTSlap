@@ -1,7 +1,7 @@
 name: TnTSlap
 main: com.Nips.TnTSlap.TnTSlap
 version: 1.00.0
-author: d3sty & Kunta
+author: d3sty
 description: Gold old slap game, with a twist.
 commands:
   tntslap:
@@ -12,3 +12,15 @@ commands:
     aliases: a
     description: stuff.
     usage: /<command>
+permissions:
+  tntslap.items.butter:
+    description: Use butter instead of slap o fish
+  tntslap.set.*:
+    description: Allow all set perms
+    children:
+      tntslap.set.nextmap
+      tntslap.set.gamestate
+  tntslap.set.nextmap:
+    description: Allow user to set next map
+  tntslap.set.gamestate:
+    description: Aloow user to stop or start game

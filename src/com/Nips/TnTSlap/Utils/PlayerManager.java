@@ -4,6 +4,7 @@ import net.minecraft.server.v1_5_R1.Packet62NamedSoundEffect;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_5_R1.entity.CraftPlayer;
@@ -14,39 +15,43 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.Nips.TnTSlap.Config.SettingsConfig;
 import com.Nips.TnTSlap.Functions.SpawnFunction;
+import com.Nips.TnTSlap.Utils.Combat.ExpHandler;
 
 public class PlayerManager {
 
 	public static void addPlayerToGame(Player p) {
 		if (GameData.PlayersInGame.contains(p)) {
-			p.sendMessage(ChatColor.RED + "Already in Game!");
+			GameManager.messageTntPlayer(p, ChatColor.YELLOW + "Already In Game!");
 			return;
 		}
-		p.sendMessage(ChatColor.YELLOW + "Joined Game");
+		p.setGameMode(GameMode.SURVIVAL);
+		GameManager.messageTntPlayer(p, ChatColor.YELLOW + "Joined Game");
 		GameData.Kills.put(p, 0);
 		GameData.PlayersInGame.add(p);
 		GameData.lastToHit.put(p, null);
 		SpawnFunction.SpawnPlayer(p);
 		setupInv(p);
+		ExpHandler.resetLevel(p);
 	}
 
 	public static void removePlayerFromGame(Player p) {
 		if (!GameData.PlayersInGame.contains(p)) {
-			p.sendMessage(ChatColor.RED + "Not in Game!");
+			GameManager.messageTntPlayer(p, ChatColor.YELLOW + "Not in Game!");
 			return;
 		}
-		p.sendMessage(ChatColor.YELLOW + "Left Game");
+		GameManager.messageTntPlayer(p, ChatColor.YELLOW + "Left Game");
 		GameData.Kills.remove(p);
 		GameData.PlayersInGame.remove(p);
 		GameData.lastToHit.remove(p);
 		p.getInventory().clear();
 		p.teleport(Bukkit.getServer().getWorld("world").getSpawnLocation());
+		ExpHandler.resetLevel(p);
 	}
 
 	public static void PlayerFell(Player p) {
 		if (GameData.Started == true) {
 			if (GameData.getLastToHit(p) == null) {
-				GameManager.announceMessage(ChatColor.RED + p.getName() + ChatColor.YELLOW + " Slipped!");
+				GameManager.announceMessage(ChatColor.YELLOW + p.getName() + ChatColor.RED + " Slipped!");
 			} else {
 				addKill(p, GameData.getLastToHit(p));
 			}
@@ -57,6 +62,9 @@ public class PlayerManager {
 
 	public static void ChangeLastAtked(final Player target, Player attacker) {
 		GameData.lastToHit.remove(target);
+		if (attacker == target) {
+			return;
+		}
 		GameData.lastToHit.put(target, attacker);
 
 		// new BukkitRunnable() {
@@ -73,7 +81,7 @@ public class PlayerManager {
 		int i = GameData.Getkills(attacker);
 		GameData.Kills.put(attacker, i + 1);
 		Location loc = attacker.getLocation();
-		Packet62NamedSoundEffect packet = new Packet62NamedSoundEffect("note.pling", loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), 0.2F, 0.9F);
+		Packet62NamedSoundEffect packet = new Packet62NamedSoundEffect("note.pling", loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), 2.0F, 1.2F);
 		((CraftPlayer) attacker).getHandle().playerConnection.sendPacket(packet);
 		if (GameData.Getkills(attacker) >= SettingsConfig.getSettingsConfig().getInt("Kills_To_Win")) {
 			GameManager.announceMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + attacker.getName() + ChatColor.GREEN + " Won The Game!");
@@ -83,16 +91,19 @@ public class PlayerManager {
 			String b = (ChatColor.RED + target.getName() + "[" + GameData.Getkills(target) + "]");
 			GameManager.announceMessage(ChatColor.GREEN + a + ChatColor.YELLOW + " K0'd " + ChatColor.RED + b);
 			KillStreaks.CheckForKillstreak(attacker, GameData.Getkills(attacker));
+			ExpHandler.resetLevel(target);
 
 		}
 		ChangeLastAtked(target, null);
 	}
 
+	/************************* Inventory Stuffs **********************/
+
 	public static void setupInv(Player p) {
 		Inventory inv = p.getInventory();
 		inv.clear();
 		inv.addItem(getHittingApperatus(p));
-
+		p.updateInventory();
 	}
 
 	public static ItemStack getHittingApperatus(Player p) {
@@ -103,6 +114,7 @@ public class PlayerManager {
 		if (p.hasPermission("tntslap.item.butter")) {
 			is = new ItemStack(Material.GOLD_INGOT);
 			im.setDisplayName("§6§lO' MAJESTIC BUTTER");
+			p.getInventory().setBoots(new ItemStack(Material.GOLD_BOOTS));
 		}
 		is.setItemMeta(im);
 

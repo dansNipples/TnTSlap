@@ -1,14 +1,19 @@
 package com.Nips.TnTSlap.Utils;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.WitherSkull;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
@@ -16,6 +21,8 @@ import org.bukkit.util.Vector;
 import com.Nips.TnTSlap.Config.SettingsConfig;
 
 public class KillStreaks {
+
+	public static Map<Integer, Player> tempwither = new HashMap<Integer, Player>();
 
 	public static ItemStack getKillstreak(int killamount) {
 		ItemStack item = new ItemStack(Material.APPLE);
@@ -43,7 +50,15 @@ public class KillStreaks {
 	// ********************************** KillStreak Functions ********************************************//
 	public static void activateKillStreak(ItemStack im, Player user) {
 		if (GameData.Started == false) {
+			if (im.getType() == Material.GOLD_INGOT || im.getType() == Material.RAW_FISH) {
+				user.sendMessage(ChatColor.GRAY + "Uh oh.. You ate you're weapon!");
+				user.getInventory().remove(im);
+				return;
+			}
 			user.getInventory().remove(im);
+			return;
+		}
+		if (im.getTypeId() == 349 || im.getTypeId() == 266) {
 			return;
 		}
 		switch (im.getType()) {
@@ -64,6 +79,7 @@ public class KillStreaks {
 			return;
 		} else {
 			rewardKillStreak(p, kills);
+			GameManager.messageTntPlayer(p, ChatColor.GREEN + "Killstreak reward earnt! Right click to Use!");
 		}
 	}
 
@@ -71,11 +87,14 @@ public class KillStreaks {
 	public static void explosionsEveryWhere(World world, Player attacker) {
 		attacker.getWorld().createExplosion(attacker.getLocation().getX(), attacker.getLocation().getY() + 1, attacker.getLocation().getZ(), 0.0F, false, false);
 
-		float knockback = 15.0f;
+		float knockback = 10.0f;
 
 		List<Entity> entities = attacker.getNearbyEntities(3.0, 3.0, 3.0);
 		if (entities.contains(attacker)) {
 			entities.remove(attacker);
+		}
+		if (entities.isEmpty() == true) {
+			GameManager.messageTntPlayer(attacker, ChatColor.YELLOW + "You Missed! Player must be within a 3 block radius for tnt to work!");
 		}
 
 		for (Entity e : entities) {
@@ -94,12 +113,17 @@ public class KillStreaks {
 		float VKnockback = 2.0f;
 
 		Block targetBlock = attacker.getTargetBlock(null, 20);
-		if (targetBlock == null) {
-			attacker.getInventory().addItem(getKillstreak(SettingsConfig.getSettingsConfig().getInt("KillStreaks.ElectroRod")));
+
+		if (targetBlock.getTypeId() == 0) {
+			GameManager.messageTntPlayer(attacker, ChatColor.YELLOW + "You Missed! Aim for the block under the player next time!");
 			return;
 		}
 		Location loc = targetBlock.getLocation();
 		final Collection<Entity> entities = targetBlock.getLocation().getWorld().getEntities();
+
+		if (entities.contains(attacker)) {
+			entities.remove(attacker);
+		}
 		final int radX = 3;
 		final int radZ = 3;
 		final int radY = 2;
@@ -132,7 +156,16 @@ public class KillStreaks {
 	}
 
 	/*********************************** Wither Bow ********************************************/
-	public static void witherBowShoot(World world, Player attacker) {
+	public static void witherBowShoot(World world, Player attacker, Entity arrow) {
+		attacker.launchProjectile(WitherSkull.class).setVelocity(arrow.getVelocity());
+		tempwither.put(arrow.getEntityId() + 1, attacker);
+	}
 
+	public static void witherBowHit(Projectile head, Entity Attackee) {
+		Player p = (Player) head.getShooter();
+		if (tempwither.containsKey(head.getEntityId())) {
+			p.sendMessage(head.getEntityId() + "");
+			Attackee.getVelocity().setY(2.0);
+		}
 	}
 }

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -27,7 +28,7 @@ public class GameManager {
 		for (Player p : GameData.PlayersInGame) {
 			GameData.lastToHit.put(p, null);
 			GameData.Kills.put(p, 0);
-
+			p.setLevel(0);
 		}
 		plugin.time.resumeit();
 		resetGame();
@@ -37,16 +38,19 @@ public class GameManager {
 		GameData.setPvp(true);
 		GameData.setGameSession(true);
 		GameData.CurrentMap = GameData.NextMap;
+		announceMessage(ChatColor.YELLOW + "Game Starting! First to " + ArenaConfig.getArenaConfig().getInt("Kills_To_Win") + " kills wins!");
 		for (Player p : GameData.PlayersInGame) {
 			PlayerManager.setupInv(p);
 			SpawnFunction.SpawnPlayer(p);
+			p.setLevel(0);
+			p.setGameMode(GameMode.SURVIVAL);
 		}
 
 	}
 
 	public static void resetGame() {
 		GameData.NextMap = pickRandomMap();
-		Bukkit.getServer().broadcastMessage(ChatColor.LIGHT_PURPLE + "New Game in 30s. Next Map will be: " + ChatColor.YELLOW + "'" + GameData.NextMap + "'");
+		Bukkit.getServer().broadcastMessage(ChatColor.RED + "[TntSlap] " + ChatColor.LIGHT_PURPLE + "New Game in 30s. Next Map will be: " + ChatColor.YELLOW + "'" + GameData.NextMap + "'");
 		new BukkitRunnable() {
 			public void run() {
 				startGame();
@@ -68,17 +72,20 @@ public class GameManager {
 
 	public static void setMap(String s, Player p) {
 		if (!ArenaConfig.getArenaConfig().contains(s)) {
-			p.sendMessage(ChatColor.RED + "No such map. Names are case sensative");
+			messageTntPlayer(p, ChatColor.YELLOW + "No such map. Names are case sensative");
 			return;
 		}
 		GameData.NextMap = s;
-		p.sendMessage(ChatColor.GREEN + "Next map set to: " + s);
+		messageTntPlayer(p, ChatColor.YELLOW + "Next map set to: " + s);
 	}
 
 	public static void announceMessage(String s) {
 		for (Player p : GameData.getPlayersInGame()) {
-			p.sendMessage(s);
+			p.sendMessage(ChatColor.RED + "[TntSlap] " + s);
 		}
 	}
 
+	public static void messageTntPlayer(Player p, String s) {
+		p.sendMessage(ChatColor.RED + "[TntSlap] " + s);
+	}
 }

@@ -18,8 +18,8 @@ permissions:
   tntslap.set.*:
     description: Allow all set perms
     children:
-      tntslap.set.nextmap
-      tntslap.set.gamestate
+      tntslap.set.nextmap: true
+      tntslap.set.gamestate: true
   tntslap.set.nextmap:
     description: Allow user to set next map
   tntslap.set.gamestate:

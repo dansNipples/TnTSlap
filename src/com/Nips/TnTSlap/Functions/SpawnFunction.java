@@ -22,6 +22,7 @@ public class SpawnFunction {
 		loc.setYaw(Float.parseFloat(s[3]));
 		loc.setPitch(Float.parseFloat(s[4]));
 		p.teleport(loc);
+		// p.setMaximumNoDamageTicks(5);
 	}
 
 	public static String grabRandomPoint(String MapName) {

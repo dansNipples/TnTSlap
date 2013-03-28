@@ -1,10 +1,12 @@
 package com.Nips.TnTSlap.Listeners;
 
-import org.bukkit.Effect;
-import org.bukkit.Location;
+import net.minecraft.server.v1_5_R1.EntityLiving;
+
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.craftbukkit.v1_5_R1.entity.CraftEntity;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -13,17 +15,19 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.util.Vector;
 
-import com.Nips.TnTSlap.Config.SettingsConfig;
 import com.Nips.TnTSlap.Utils.GameData;
 import com.Nips.TnTSlap.Utils.KillStreaks;
 import com.Nips.TnTSlap.Utils.PlayerManager;
+import com.Nips.TnTSlap.Utils.Combat.CombatHandler;
 
 public class EntityListener implements Listener {
 
@@ -44,41 +48,25 @@ public class EntityListener implements Listener {
 
 	@EventHandler
 	public void EntityAttackEntity(EntityDamageByEntityEvent event) {
+
 		if (event.getEntityType() == EntityType.PLAYER && event.getDamager().getType() == EntityType.PLAYER) {
 			Player p = (Player) event.getEntity();
 			Player p2 = (Player) event.getDamager();
 			if (GameData.PlayersInGame.contains(p) && GameData.PlayersInGame.contains(p2)) {
-				/** Quick Checks Start **/
-				if (GameData.Pvp == false) { // check if pvp is off
-					event.setCancelled(true);
+				CraftEntity cEntity = (CraftEntity) p;
+				EntityLiving entity = (EntityLiving) cEntity.getHandle();
+				if (GameData.Pvp == false || GameData.Started == false) {
 					return;
 				}
-				if (!(p2.getItemInHand().getTypeId() == 349)) {
-					event.setCancelled(true);
-					return;
-				}
-				Location loc = event.getEntity().getLocation(); // check if player is falling
-				Location loc2 = event.getDamager().getLocation();
-				loc2.setY(loc2.getY() - 2);
-				loc.setY(loc.getY() - 1);
-				int block = loc.getWorld().getBlockTypeIdAt(loc);
-				int block2 = loc.getWorld().getBlockTypeIdAt(loc2);
-				if (block == 0 && block2 == 0) {
-					event.setCancelled(true);
-					return;
-				}
-				/** Quick Checks End **/
+				if (entity.maxNoDamageTicks < 20) {
+					entity.maxNoDamageTicks = 20;
 
-				Player target = (Player) event.getEntity();
-				Player attacker = (Player) event.getDamager();
-				target.getWorld().playEffect(target.getLocation(), Effect.getById(2001), 55);
-				float Hknockback = (float) SettingsConfig.getSettingsConfig().getDouble("Default_Horizontal_KnockBack");
-				float Yknockback = (float) SettingsConfig.getSettingsConfig().getDouble("Default_Verticle_KnockBack");
-				Vector v = target.getVelocity().add(target.getLocation().toVector().subtract(attacker.getLocation().toVector()).normalize().multiply(Hknockback));
-				v.setY(Yknockback);
-				target.setVelocity(v);
-				event.setDamage(0);
-				PlayerManager.ChangeLastAtked(target, attacker);
+				}
+				if (entity.noDamageTicks < entity.maxNoDamageTicks / 2.0F) {
+					CombatHandler.playerHit(p2, p, p2.getItemInHand());
+					entity.noDamageTicks = 20;
+
+				}
 				event.setCancelled(true);
 			}
 		}
@@ -91,7 +79,7 @@ public class EntityListener implements Listener {
 		Entity e = event.getEntity();
 		if (e instanceof Player) {
 			Player p = (Player) event.getEntity();
-			if (GameData.PlayersInGame.contains(p)) { // no fall damage for players
+			if (GameData.PlayersInGame.contains(p)) { // no damage generally
 
 				event.setDamage(0);
 
@@ -111,10 +99,11 @@ public class EntityListener implements Listener {
 				}
 			}
 		}
-		Player player = event.getPlayer();
 		if (event.getClickedBlock() == null) {
-
-		} else if (event.getClickedBlock().getType() != null) {
+			return;
+		}
+		Player player = event.getPlayer();
+		if (event.getClickedBlock().getType() != null) {
 			Block block = event.getClickedBlock();
 			if (block.getTypeId() == 68 || block.getTypeId() == 63) {
 				Sign sign = (Sign) block.getState();
@@ -131,27 +120,29 @@ public class EntityListener implements Listener {
 
 	// ********************************** Projectile Launched ********************************************//
 
-	// @EventHandler
-	// public void onShoot(ProjectileLaunchEvent event) {
-	// if (event.getEntity() instanceof Arrow) {
-	// Arrow arrow = (Arrow) event.getEntity();
-	// if (arrow.getShooter() instanceof Player) {
-	// Player shooter = (Player) arrow.getShooter();
-	// if (shooter.getItemInHand().getType() == Material.BOW && GameData.PlayersInGame.contains(shooter)) {
-	// event.setCancelled(true);
-	// shooter.launchProjectile(WitherSkull.class).setVelocity(arrow.getVelocity());
-	//
-	// }
-	// }
-	// }
-	// }
+	@EventHandler
+	public void onShoot(ProjectileLaunchEvent event) {
+		if (event.getEntity() instanceof Arrow) {
+			Arrow arrow = (Arrow) event.getEntity();
+			if (arrow.getShooter() instanceof Player) {
+				Player shooter = (Player) arrow.getShooter();
+				if (shooter.getItemInHand().getType() == Material.BOW && GameData.PlayersInGame.contains(shooter)) {
+					event.setCancelled(true);
+					KillStreaks.witherBowShoot(shooter.getWorld(), shooter, arrow);
+				}
+			}
+		}
+	}
+
 	/** ONE DAY... **/
-	// @EventHandler
-	// public void onProjectileHit(ProjectileHitEvent event) {
-	// Bukkit.getServer().broadcastMessage("Leroy by " + event.getEntity().getShooter() + " & " + event.getEntityType());
-	//
-	// }
-	//
+	@EventHandler
+	public void onProjectileHit(ProjectileHitEvent event) {
+		Player p = (Player) event.getEntity().getShooter();
+		p.sendMessage("" + event.getEntity().getEntityId());
+		// KillStreaks.witherBowHit(event.getEntity());
+
+	}
+
 	// @EventHandler
 	// public void EntityShoot(EntityShootBowEvent event) {
 	//
@@ -160,8 +151,8 @@ public class EntityListener implements Listener {
 	// ********************************** Player Joins or Leaves ********************************************//
 
 	@EventHandler
-	public void playerJoin(PlayerLoginEvent event) {
-
+	public void playerJoin(PlayerJoinEvent event) {
+		event.getPlayer().teleport(event.getPlayer().getWorld().getSpawnLocation());
 	}
 
 	@EventHandler
@@ -178,6 +169,15 @@ public class EntityListener implements Listener {
 		if (event.getEntityType() == EntityType.PLAYER) {
 			Player p = (Player) event.getEntity();
 			p.setSaturation(20.0f);
+			event.setCancelled(true);
+		}
+	}
+
+	// ********************************** Entity Explode ********************************************//
+
+	@EventHandler
+	public void entityExplode(EntityExplodeEvent event) {
+		if (event.getEntityType() == EntityType.WITHER_SKULL && KillStreaks.tempwither.containsKey(event.getEntity().getEntityId())) {
 			event.setCancelled(true);
 		}
 	}

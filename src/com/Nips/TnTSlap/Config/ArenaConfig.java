@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Set;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -14,6 +15,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import com.Nips.TnTSlap.TnTSlap;
+import com.Nips.TnTSlap.Utils.GameManager;
 
 public class ArenaConfig {
 	private static TnTSlap plugin;
@@ -26,8 +28,13 @@ public class ArenaConfig {
 	private static File customArenaFile = null;
 
 	public static void CreateArena(String Name, String CreatorName) {
+		if (getArenaConfig().contains(Name)) {
+			GameManager.messageTntPlayer(Bukkit.getPlayer(CreatorName), ChatColor.YELLOW + "Arena Already Exists!");
+			return;
+		}
 		getArenaConfig().set(Name, "Made by: " + CreatorName);
 		saveArenaConfig();
+		GameManager.messageTntPlayer(Bukkit.getPlayer(CreatorName), ChatColor.YELLOW + "Arena Created!");
 	}
 
 	public static void DeleteArena(String Name, Player p) {
@@ -45,7 +52,7 @@ public class ArenaConfig {
 		int j;
 		Location loc = p.getLocation();
 		if (!getArenaConfig().contains(Name)) {
-			p.sendMessage(ChatColor.RED + "No such arena name!");
+			GameManager.messageTntPlayer(p, ChatColor.YELLOW + "Arena Does Not Exist!");
 			return;
 		}
 		if (!getArenaConfig().contains(Name + ".1")) {
@@ -56,6 +63,8 @@ public class ArenaConfig {
 
 		getArenaConfig().set(Name + "." + j, loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch());
 		saveArenaConfig();
+		GameManager.messageTntPlayer(p, ChatColor.YELLOW + "Point Set At:");
+		GameManager.messageTntPlayer(p, ChatColor.YELLOW + "  X: " + loc.getX() + "     Y:" + loc.getY() + "     Z:" + loc.getZ());
 	}
 
 	public static Integer getPointCount(String Name) {

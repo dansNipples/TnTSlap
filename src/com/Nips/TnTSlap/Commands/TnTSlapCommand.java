@@ -1,11 +1,14 @@
 package com.Nips.TnTSlap.Commands;
 
+import java.util.Set;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.Nips.TnTSlap.Config.ArenaConfig;
 import com.Nips.TnTSlap.Config.SettingsConfig;
 import com.Nips.TnTSlap.Utils.GameData;
 import com.Nips.TnTSlap.Utils.GameManager;
@@ -15,6 +18,18 @@ public class TnTSlapCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		Player player = (Player) sender;
+		if (args.length == 0 || args.length > 1 && args[0].equalsIgnoreCase("help")) {
+			player.sendMessage(ChatColor.LIGHT_PURPLE + "  ======  " + ChatColor.YELLOW + "" + ChatColor.BOLD + "TntSlap Commands" + ChatColor.LIGHT_PURPLE + "  ======  ");
+			player.sendMessage(ChatColor.AQUA + "    Aliases:" + ChatColor.YELLOW + " [tntslap: ts]");
+			player.sendMessage(ChatColor.LIGHT_PURPLE + "Join:" + ChatColor.YELLOW + " '/tntslap join' to join the game!");
+			player.sendMessage(ChatColor.LIGHT_PURPLE + "Leave:" + ChatColor.YELLOW + " '/tntslap leave' to leave the game!");
+			if (player.isOp() == true || player.hasPermission("tntslap.set.nextmap")) {
+				player.sendMessage(ChatColor.LIGHT_PURPLE + "Start:" + ChatColor.YELLOW + " '/tntslap start' to force start a game! [MAY CAUSE PROBLEMS!]");
+				player.sendMessage(ChatColor.LIGHT_PURPLE + "Set map:" + ChatColor.YELLOW + " '/tntslap set map' to force next map! [NOT WORKING]");
+				player.sendMessage(ChatColor.LIGHT_PURPLE + "ListMaps:" + ChatColor.YELLOW + " '/tntslap listmaps' to get all map names Case sensitive");
+			}
+			return true;
+		}
 
 		if (args.length > 0) {
 			if (args[0].equalsIgnoreCase("join")) {
@@ -22,6 +37,13 @@ public class TnTSlapCommand implements CommandExecutor {
 			}
 			if (args[0].equalsIgnoreCase("leave")) {
 				PlayerManager.removePlayerFromGame(player);
+			}
+			if (args[0].equalsIgnoreCase("listmaps")) {
+				Set<String> keys = ArenaConfig.getArenaConfig().getKeys(false);
+				String stack = "";
+				for (String s : keys) {
+					stack = stack + ChatColor.AQUA + s + ChatColor.RED + ", ";
+				}
 			}
 			if (args[0].equalsIgnoreCase("start")) {
 				if (player.isOp()) {

@@ -3,6 +3,7 @@ package com.Nips.TnTSlap.Commands;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,8 +24,9 @@ public class TnTSlapCommand implements CommandExecutor {
 			player.sendMessage(ChatColor.AQUA + "    Aliases:" + ChatColor.YELLOW + " [tntslap: ts]");
 			player.sendMessage(ChatColor.LIGHT_PURPLE + "Join:" + ChatColor.YELLOW + " '/tntslap join' to join the game!");
 			player.sendMessage(ChatColor.LIGHT_PURPLE + "Leave:" + ChatColor.YELLOW + " '/tntslap leave' to leave the game!");
+			player.sendMessage(ChatColor.LIGHT_PURPLE + "Helpme:" + ChatColor.YELLOW + " '/tntslap helpme' to get a book for help!");
 			if (player.isOp() == true || player.hasPermission("tntslap.set.nextmap")) {
-				player.sendMessage(ChatColor.LIGHT_PURPLE + "Start:" + ChatColor.YELLOW + " '/tntslap start' to force start a game! [MAY CAUSE PROBLEMS!]");
+				player.sendMessage(ChatColor.LIGHT_PURPLE + "Start:" + ChatColor.YELLOW + " '/tntslap start' to force start a game! ");
 				player.sendMessage(ChatColor.LIGHT_PURPLE + "Set map:" + ChatColor.YELLOW + " '/tntslap set map' to force next map! [NOT WORKING]");
 				player.sendMessage(ChatColor.LIGHT_PURPLE + "ListMaps:" + ChatColor.YELLOW + " '/tntslap listmaps' to get all map names Case sensitive");
 			}
@@ -38,12 +40,21 @@ public class TnTSlapCommand implements CommandExecutor {
 			if (args[0].equalsIgnoreCase("leave")) {
 				PlayerManager.removePlayerFromGame(player);
 			}
+			if (args[0].equalsIgnoreCase("helpme")) {
+				if (!GameData.PlayersInGame.contains(player)) {
+					if (!player.getInventory().contains(Material.WRITTEN_BOOK)) {
+						player.getInventory().addItem(HelpBookBuilder.BuildBook());
+					}
+				} else
+					GameManager.messageTntPlayer(player, ChatColor.RED + "cannot use this ingame!");
+			}
 			if (args[0].equalsIgnoreCase("listmaps")) {
 				Set<String> keys = ArenaConfig.getArenaConfig().getKeys(false);
 				String stack = "";
 				for (String s : keys) {
 					stack = stack + ChatColor.AQUA + s + ChatColor.RED + ", ";
 				}
+				player.sendMessage(stack);
 			}
 			if (args[0].equalsIgnoreCase("start")) {
 				if (player.isOp()) {

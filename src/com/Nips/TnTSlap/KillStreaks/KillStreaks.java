@@ -1,4 +1,4 @@
-package com.Nips.TnTSlap.Utils;
+package com.Nips.TnTSlap.KillStreaks;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.WitherSkull;
@@ -18,11 +19,21 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
+import com.Nips.TnTSlap.TnTSlap;
 import com.Nips.TnTSlap.Config.SettingsConfig;
+import com.Nips.TnTSlap.Utils.GameData;
+import com.Nips.TnTSlap.Utils.GameManager;
+import com.Nips.TnTSlap.Utils.PlayerManager;
 
 public class KillStreaks {
+	private static TnTSlap plugin;
+
+	public KillStreaks(TnTSlap plugin) {
+		KillStreaks.plugin = plugin;
+	}
 
 	public static Map<Integer, Player> tempwither = new HashMap<Integer, Player>();
+	public static Map<Player, Boolean> canPlayerDoubleJump = new HashMap<Player, Boolean>();
 
 	public static ItemStack getKillstreak(int killamount) {
 		ItemStack item = new ItemStack(Material.APPLE);
@@ -50,15 +61,12 @@ public class KillStreaks {
 	// ********************************** KillStreak Functions ********************************************//
 	public static void activateKillStreak(ItemStack im, Player user) {
 		if (GameData.Started == false) {
-			if (im.getType() == Material.GOLD_INGOT || im.getType() == Material.RAW_FISH) {
-				user.sendMessage(ChatColor.GRAY + "Uh oh.. You ate you're weapon!");
-				user.getInventory().remove(im);
-				return;
-			}
-			user.getInventory().remove(im);
-			return;
-		}
-		if (im.getTypeId() == 349 || im.getTypeId() == 266) {
+			// if (im.getType() == Material.GOLD_INGOT || im.getType() == Material.RAW_FISH) {
+			// user.sendMessage(ChatColor.GRAY + "Uh oh.. You ate you're weapon!");
+			// user.getInventory().remove(im);
+			// return;
+			// }
+			user.getInventory().removeItem(im);
 			return;
 		}
 		switch (im.getType()) {
@@ -71,7 +79,7 @@ public class KillStreaks {
 		default:
 			break;
 		}
-		user.getInventory().remove(im);
+		user.getInventory().removeItem(new ItemStack(im.getType(), 1));
 	}
 
 	public static void CheckForKillstreak(Player p, int kills) {
@@ -98,6 +106,9 @@ public class KillStreaks {
 		}
 
 		for (Entity e : entities) {
+			if (e.getType() != EntityType.PLAYER) {
+				return;
+			}
 			e.getWorld().createExplosion(e.getLocation().getX(), e.getLocation().getY() + 1, e.getLocation().getZ(), 0.0F, false, false);
 			Vector v = e.getVelocity().add(e.getLocation().toVector().subtract(attacker.getLocation().toVector()).normalize().multiply(knockback));
 			v.setY(2.0f);
@@ -112,7 +123,7 @@ public class KillStreaks {
 		float HKnockback = 15.0f;
 		float VKnockback = 2.0f;
 
-		Block targetBlock = attacker.getTargetBlock(null, 20);
+		Block targetBlock = attacker.getTargetBlock(null, 100);
 
 		if (targetBlock.getTypeId() == 0) {
 			GameManager.messageTntPlayer(attacker, ChatColor.YELLOW + "You Missed! Aim for the block under the player next time!");
@@ -168,4 +179,17 @@ public class KillStreaks {
 			Attackee.getVelocity().setY(2.0);
 		}
 	}
+
+	/*********************************** Double Jump ********************************************/
+
+	public static void tryDoubleJump(final Player p) {
+		Vector v2 = p.getLocation().getDirection();
+		v2.setY(1.32);
+		if (canPlayerDoubleJump.containsKey(p) && canPlayerDoubleJump.get(p) == false) {
+			return;
+		}
+		p.setVelocity(v2);
+		canPlayerDoubleJump.put(p, false);
+	}
+
 }

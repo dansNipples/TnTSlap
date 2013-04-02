@@ -2,6 +2,7 @@ package com.Nips.TnTSlap.Listeners;
 
 import net.minecraft.server.v1_5_R1.EntityLiving;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -19,13 +20,16 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import com.Nips.TnTSlap.KillStreaks.KillStreaks;
 import com.Nips.TnTSlap.Utils.GameData;
-import com.Nips.TnTSlap.Utils.KillStreaks;
+import com.Nips.TnTSlap.Utils.GameManager;
 import com.Nips.TnTSlap.Utils.PlayerManager;
 import com.Nips.TnTSlap.Utils.Combat.CombatHandler;
 
@@ -36,10 +40,20 @@ public class EntityListener implements Listener {
 	@EventHandler
 	public void PlayerMoved(PlayerMoveEvent event) {
 		Player p = event.getPlayer();
-		if (event.getPlayer().getLocation().getY() <= -5 && GameData.PlayersInGame.contains(event.getPlayer())) {
-			if (p != null) {
-				PlayerManager.PlayerFell(p);
-				p.setFallDistance(0f);
+		if (p.getInventory().getBoots() == null) {
+			return;
+		}
+		if (GameData.PlayersInGame.contains(event.getPlayer())) {
+			Block b = p.getWorld().getBlockAt(p.getLocation().subtract(0, 1, 0));
+
+			if (KillStreaks.canPlayerDoubleJump.containsKey(p) && KillStreaks.canPlayerDoubleJump.get(p) == false && b.getType() != Material.AIR && p.getVelocity().getY() <= 0) {
+				KillStreaks.canPlayerDoubleJump.put(p, true);
+			}
+			if (event.getPlayer().getLocation().getY() <= -5) {
+				if (p != null) {
+					PlayerManager.PlayerFell(p);
+					p.setFallDistance(0f);
+				}
 			}
 		}
 	}
@@ -56,6 +70,7 @@ public class EntityListener implements Listener {
 				CraftEntity cEntity = (CraftEntity) p;
 				EntityLiving entity = (EntityLiving) cEntity.getHandle();
 				if (GameData.Pvp == false || GameData.Started == false) {
+					event.setCancelled(true);
 					return;
 				}
 				if (entity.maxNoDamageTicks < 20) {
@@ -95,6 +110,12 @@ public class EntityListener implements Listener {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			if (GameData.PlayersInGame.contains(event.getPlayer())) {
 				if (event.getPlayer().getItemInHand().getType() != Material.AIR) {
+					if (event.getItem().getType() == Material.GOLD_INGOT) {
+						KillStreaks.tryDoubleJump(event.getPlayer());
+						return;
+					} else if (event.getItem().getType() == Material.RAW_FISH) {
+						return;
+					}
 					KillStreaks.activateKillStreak(event.getItem(), event.getPlayer());
 				}
 			}
@@ -116,6 +137,18 @@ public class EntityListener implements Listener {
 			}
 			return;
 		}
+	}
+
+	// ********************************** Throw item ********************************************//
+	@EventHandler
+	public void dropItem(PlayerDropItemEvent event) {
+		Player p = event.getPlayer();
+		if (!GameData.PlayersInGame.contains(p)) {
+			if (event.getItemDrop().getItemStack().getType() == Material.WRITTEN_BOOK || event.getItemDrop().getItemStack().getType() == Material.GOLD_BOOTS) {
+				event.setCancelled(true);
+			}
+		} else
+			event.setCancelled(true);
 	}
 
 	// ********************************** Projectile Launched ********************************************//
@@ -160,6 +193,21 @@ public class EntityListener implements Listener {
 		if (GameData.PlayersInGame.contains(event.getPlayer())) {
 			PlayerManager.removePlayerFromGame(event.getPlayer());
 		}
+
+	}
+
+	// ********************************** Command Send ********************************************//
+	@EventHandler
+	public void sendCommanddd(PlayerCommandPreprocessEvent event) {
+		if (GameData.PlayersInGame.contains(event.getPlayer())) {
+			if (event.getPlayer().hasPermission("tntslap.bypass.nocommands")) {
+				return;
+			}
+			if (!(event.getMessage().toLowerCase().startsWith("/tntslap") || event.getMessage().toLowerCase().startsWith("/ts"))) {
+				GameManager.messageTntPlayer(event.getPlayer(), ChatColor.RED + "Cannot use that command ingame!");
+				event.setCancelled(true);
+			}
+		}
 	}
 
 	// ********************************** Food Level Changed ********************************************//
@@ -177,9 +225,9 @@ public class EntityListener implements Listener {
 
 	@EventHandler
 	public void entityExplode(EntityExplodeEvent event) {
-		if (event.getEntityType() == EntityType.WITHER_SKULL && KillStreaks.tempwither.containsKey(event.getEntity().getEntityId())) {
-			event.setCancelled(true);
-		}
+		// if (event.getEntityType() == EntityType.WITHER_SKULL && KillStreaks.tempwither.containsKey(event.getEntity().getEntityId())) {
+		// event.setCancelled(true);
+		// }
 	}
 
 }

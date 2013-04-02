@@ -8,7 +8,8 @@ import org.bukkit.entity.Player;
 
 public class GameData {
 	public static ArrayList<Player> PlayersInGame = new ArrayList<Player>();
-	public static Map<Player, Integer> Kills = new HashMap<Player, Integer>();
+	public static Map<Player, Integer> TotalKills = new HashMap<Player, Integer>();
+	public static Map<Player, Integer> Killstreak = new HashMap<Player, Integer>();
 	public static Map<Player, Player> lastToHit = new HashMap<Player, Player>();
 	public static String CurrentMap;
 	public static String NextMap;
@@ -17,7 +18,11 @@ public class GameData {
 	public static boolean Pvp;
 
 	public static int Getkills(Player p) {
-		return Kills.get(p);
+		return TotalKills.get(p);
+	}
+
+	public static int GetKillstreak(Player p) {
+		return Killstreak.get(p);
 	}
 
 	public static Player getLastToHit(Player p) {

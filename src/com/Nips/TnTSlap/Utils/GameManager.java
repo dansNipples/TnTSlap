@@ -13,6 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.Nips.TnTSlap.TnTSlap;
 import com.Nips.TnTSlap.Config.ArenaConfig;
+import com.Nips.TnTSlap.Config.SettingsConfig;
 import com.Nips.TnTSlap.Functions.SpawnFunction;
 
 public class GameManager {
@@ -27,7 +28,8 @@ public class GameManager {
 		GameData.setGameSession(false);
 		for (Player p : GameData.PlayersInGame) {
 			GameData.lastToHit.put(p, null);
-			GameData.Kills.put(p, 0);
+			GameData.TotalKills.put(p, 0);
+			GameData.Killstreak.put(p, 0);
 			p.setLevel(0);
 		}
 		plugin.time.resumeit();
@@ -38,7 +40,7 @@ public class GameManager {
 		GameData.setPvp(true);
 		GameData.setGameSession(true);
 		GameData.CurrentMap = GameData.NextMap;
-		announceMessage(ChatColor.YELLOW + "Game Starting! First to " + ArenaConfig.getArenaConfig().getInt("Kills_To_Win") + " kills wins!");
+		announceMessage(ChatColor.YELLOW + "Game Starting! First to " + SettingsConfig.getSettingsConfig().getInt("Kills_To_Win") + " kills wins!");
 		for (Player p : GameData.PlayersInGame) {
 			PlayerManager.setupInv(p);
 			SpawnFunction.SpawnPlayer(p);

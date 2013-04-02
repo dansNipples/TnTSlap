@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.Nips.TnTSlap.Config.SettingsConfig;
 import com.Nips.TnTSlap.Functions.SpawnFunction;
+import com.Nips.TnTSlap.KillStreaks.KillStreaks;
 import com.Nips.TnTSlap.Utils.Combat.ExpHandler;
 
 public class PlayerManager {
@@ -26,7 +27,8 @@ public class PlayerManager {
 		}
 		p.setGameMode(GameMode.SURVIVAL);
 		GameManager.messageTntPlayer(p, ChatColor.YELLOW + "Joined Game");
-		GameData.Kills.put(p, 0);
+		GameData.TotalKills.put(p, 0);
+		GameData.Killstreak.put(p, 0);
 		GameData.PlayersInGame.add(p);
 		GameData.lastToHit.put(p, null);
 		SpawnFunction.SpawnPlayer(p);
@@ -40,7 +42,8 @@ public class PlayerManager {
 			return;
 		}
 		GameManager.messageTntPlayer(p, ChatColor.YELLOW + "Left Game");
-		GameData.Kills.remove(p);
+		GameData.TotalKills.remove(p);
+		GameData.Killstreak.remove(p);
 		GameData.PlayersInGame.remove(p);
 		GameData.lastToHit.remove(p);
 		p.getInventory().clear();
@@ -55,6 +58,7 @@ public class PlayerManager {
 			} else {
 				addKill(p, GameData.getLastToHit(p));
 			}
+			GameData.Killstreak.put(p, 0);
 		}
 
 		SpawnFunction.SpawnPlayer(p);
@@ -79,7 +83,9 @@ public class PlayerManager {
 
 	public static void addKill(Player target, Player attacker) {
 		int i = GameData.Getkills(attacker);
-		GameData.Kills.put(attacker, i + 1);
+		int j = GameData.GetKillstreak(attacker);
+		GameData.TotalKills.put(attacker, i + 1);
+		GameData.Killstreak.put(attacker, j + 1);
 		Location loc = attacker.getLocation();
 		Packet62NamedSoundEffect packet = new Packet62NamedSoundEffect("note.pling", loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), 2.0F, 1.2F);
 		((CraftPlayer) attacker).getHandle().playerConnection.sendPacket(packet);
@@ -90,7 +96,7 @@ public class PlayerManager {
 			String a = (ChatColor.GREEN + attacker.getName() + "[" + GameData.Getkills(attacker) + "]");
 			String b = (ChatColor.RED + target.getName() + "[" + GameData.Getkills(target) + "]");
 			GameManager.announceMessage(ChatColor.GREEN + a + ChatColor.YELLOW + " K0'd " + ChatColor.RED + b);
-			KillStreaks.CheckForKillstreak(attacker, GameData.Getkills(attacker));
+			KillStreaks.CheckForKillstreak(attacker, GameData.GetKillstreak(attacker));
 			ExpHandler.resetLevel(target);
 
 		}

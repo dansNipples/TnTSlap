@@ -131,6 +131,6 @@ public class Timer implements Runnable {
 	 * Remove task from scheduler
 	 * 
 	 * @return True if successfully stopped. Else false.
-	 */
+	 *///
 
 }

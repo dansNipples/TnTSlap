@@ -79,7 +79,14 @@ public class KillStreaks {
 		default:
 			break;
 		}
-		user.getInventory().removeItem(new ItemStack(im.getType(), 1));
+		if(im.getAmount() > 1){
+			int amount = im.getAmount();
+			int sub = amount - 1;
+			user.getInventory().removeItem(im);
+			im.setAmount(sub);
+			user.getInventory().addItem(im);
+		} else
+		user.getInventory().removeItem(im);
 	}
 
 	public static void CheckForKillstreak(Player p, int kills) {

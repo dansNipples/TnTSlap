@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Users/Quintin/Downloads/craftbukkit-1.4.7-R1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Quintin/Downloads/craftbukkit-1.5-R0.1-20130316.233353-19.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Quintin/Downloads/ScoreboardAPI.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

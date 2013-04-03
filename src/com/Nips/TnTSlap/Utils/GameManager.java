@@ -15,6 +15,7 @@ import com.Nips.TnTSlap.TnTSlap;
 import com.Nips.TnTSlap.Config.ArenaConfig;
 import com.Nips.TnTSlap.Config.SettingsConfig;
 import com.Nips.TnTSlap.Functions.SpawnFunction;
+import com.Nips.TnTSlap.Utils.LeaderBoard.LeaderBoard;
 
 public class GameManager {
 	private static TnTSlap plugin;
@@ -40,6 +41,7 @@ public class GameManager {
 		GameData.setPvp(true);
 		GameData.setGameSession(true);
 		GameData.CurrentMap = GameData.NextMap;
+		//LeaderBoard.enableScoreBoard();
 		announceMessage(ChatColor.YELLOW + "Game Starting! First to " + SettingsConfig.getSettingsConfig().getInt("Kills_To_Win") + " kills wins!");
 		for (Player p : GameData.PlayersInGame) {
 			PlayerManager.setupInv(p);
@@ -51,12 +53,12 @@ public class GameManager {
 	}
 
 	public static void resetGame() {
+		String LastMap = GameData.CurrentMap;
 		GameData.NextMap = pickRandomMap();
 		Bukkit.getServer().broadcastMessage(ChatColor.RED + "[TntSlap] " + ChatColor.LIGHT_PURPLE + "New Game in 30s. Next Map will be: " + ChatColor.YELLOW + "'" + GameData.NextMap + "'");
 		new BukkitRunnable() {
 			public void run() {
 				startGame();
-
 			}
 		}.runTaskLater(plugin, 600);
 	}
@@ -64,12 +66,14 @@ public class GameManager {
 	public static String pickRandomMap() {
 		Set<String> maps = ArenaConfig.getArenaConfig().getKeys(false);
 		List<String> mapss = new ArrayList<String>();
+		if(GameData.CurrentMap != null){
+			mapss.remove(GameData.CurrentMap);
+		}
 		mapss.addAll(maps);
 		Random rand = new Random();
 		Integer i = rand.nextInt(maps.size());
 		String s = mapss.get(i);
 		return s;
-
 	}
 
 	public static void setMap(String s, Player p) {

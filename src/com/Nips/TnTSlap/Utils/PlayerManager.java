@@ -15,8 +15,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.Nips.TnTSlap.Config.SettingsConfig;
 import com.Nips.TnTSlap.Functions.SpawnFunction;
+import com.Nips.TnTSlap.KillStreaks.KillStreak;
 import com.Nips.TnTSlap.KillStreaks.KillStreaks;
 import com.Nips.TnTSlap.Utils.Combat.ExpHandler;
+import com.Nips.TnTSlap.Utils.LeaderBoard.LeaderBoard;
+import com.Nips.TnTSlap.Utils.LeaderBoard.LeaderBoardHandler;
 
 public class PlayerManager {
 
@@ -31,6 +34,7 @@ public class PlayerManager {
 		GameData.Killstreak.put(p, 0);
 		GameData.PlayersInGame.add(p);
 		GameData.lastToHit.put(p, null);
+		//LeaderBoard.enablePlayerScoreBoard(p);
 		SpawnFunction.SpawnPlayer(p);
 		setupInv(p);
 		ExpHandler.resetLevel(p);
@@ -46,6 +50,7 @@ public class PlayerManager {
 		GameData.Killstreak.remove(p);
 		GameData.PlayersInGame.remove(p);
 		GameData.lastToHit.remove(p);
+		//LeaderBoard.disableScoreBoard(p);
 		p.getInventory().clear();
 		p.teleport(Bukkit.getServer().getWorld("world").getSpawnLocation());
 		ExpHandler.resetLevel(p);
@@ -86,6 +91,7 @@ public class PlayerManager {
 		int j = GameData.GetKillstreak(attacker);
 		GameData.TotalKills.put(attacker, i + 1);
 		GameData.Killstreak.put(attacker, j + 1);
+		//LeaderBoardHandler.getStats();
 		Location loc = attacker.getLocation();
 		Packet62NamedSoundEffect packet = new Packet62NamedSoundEffect("note.pling", loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), 2.0F, 1.2F);
 		((CraftPlayer) attacker).getHandle().playerConnection.sendPacket(packet);
@@ -95,10 +101,26 @@ public class PlayerManager {
 		} else {
 			String a = (ChatColor.GREEN + attacker.getName() + "[" + GameData.Getkills(attacker) + "]");
 			String b = (ChatColor.RED + target.getName() + "[" + GameData.Getkills(target) + "]");
-			GameManager.announceMessage(ChatColor.GREEN + a + ChatColor.YELLOW + " K0'd " + ChatColor.RED + b);
+			int kills = GameData.Getkills(attacker);
+			int max = SettingsConfig.getSettingsConfig().getInt("Kills_To_Win");
+			int maxHalf = Math.round((max/2));
+			int maxFourth = Math.round((max/4)*3);
+			int last = max - 1;
+			GameManager.messageTntPlayer(attacker, ChatColor.YELLOW + "You knocked off player: " + b);
+			GameManager.messageTntPlayer(attacker, ChatColor.YELLOW + "You now have " + ChatColor.RED + GameData.TotalKills.get(attacker) + ChatColor.YELLOW + " Knock-Outs!");
+			GameManager.messageTntPlayer(attacker, ChatColor.YELLOW + "Your killstreak is: " + ChatColor.RED + GameData.GetKillstreak(attacker));
+			GameManager.messageTntPlayer(target, ChatColor.YELLOW + "Knocked off by player: " + ChatColor.RED + attacker.getName() + "[" + GameData.Getkills(attacker) + "]");
+			if(kills == maxHalf){
+				GameManager.announceMessage(ChatColor.YELLOW + "Player " + ChatColor.RED + attacker.getName() + ChatColor.YELLOW + " has " + (max - maxHalf) + " Knock-Outs to go!");
+			}
+			if(kills == maxFourth){
+				GameManager.announceMessage(ChatColor.YELLOW + "Player " + ChatColor.RED + attacker.getName() + ChatColor.YELLOW + " has " + (max - maxFourth) + " Knock-Outs to go!");
+			}
+			if(kills == last){
+				GameManager.announceMessage(ChatColor.YELLOW + "Player " + ChatColor.RED + attacker.getName() + ChatColor.YELLOW + " has " + (max - last) + " Knock-Out to go!");
+			}
 			KillStreaks.CheckForKillstreak(attacker, GameData.GetKillstreak(attacker));
 			ExpHandler.resetLevel(target);
-
 		}
 		ChangeLastAtked(target, null);
 	}

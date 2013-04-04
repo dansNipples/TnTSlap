@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 public class Stats {
 	private static Map<Player, Integer> OverallWins = new HashMap<Player, Integer>();
 
-	public static <K, V> List<Entry<K, V>> entriesSortedByValues(Map<K, V> map) {
+	public static <K, V> List<Entry<K, V>> sortedMap(Map<K, V> map) {
 
 		List<Entry<K, V>> sortedEntries = new ArrayList<Entry<K, V>>(map.entrySet());
 

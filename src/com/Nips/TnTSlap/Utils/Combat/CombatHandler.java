@@ -45,8 +45,8 @@ public class CombatHandler {
 		if (defender.getLevel() == 0) {
 			knockback = 0.2f;
 			Yknockback = 0.2f;
-		} else if (defender.getLevel() > 100 || knockback > 10.0 || Yknockback > 5.0) {
-			knockback = 6;
+		} else if (defender.getLevel() > 100 || knockback > 8.0 || Yknockback > 3.0) {
+			knockback = 8;
 			Yknockback = 3;
 		}
 		Vector v = defender.getVelocity().add(defender.getLocation().toVector().subtract(attacker.getLocation().toVector()).normalize().multiply(knockback));

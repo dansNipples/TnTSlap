@@ -1,12 +1,12 @@
 package com.Nips.TnTSlap.Listeners;
 
-import net.minecraft.server.v1_5_R1.EntityLiving;
+import net.minecraft.server.v1_5_R2.EntityLiving;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.v1_5_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_5_R2.entity.CraftEntity;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -16,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -24,7 +25,6 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.Nips.TnTSlap.KillStreaks.KillStreaks;
@@ -37,26 +37,28 @@ public class EntityListener implements Listener {
 
 	// ********************************** Player Moved ********************************************//
 
-	@EventHandler
-	public void PlayerMoved(PlayerMoveEvent event) {
-		Player p = event.getPlayer();
-		if (p.getInventory().getBoots() == null) {
-			return;
-		}
-		if (GameData.PlayersInGame.contains(event.getPlayer())) {
-			Block b = p.getWorld().getBlockAt(p.getLocation().subtract(0, 1, 0));
+	/** COULD BE CAUSING MEMORY LEAK **/
 
-			if (KillStreaks.canPlayerDoubleJump.containsKey(p) && KillStreaks.canPlayerDoubleJump.get(p) == false && b.getType() != Material.AIR && p.getVelocity().getY() <= 0) {
-				KillStreaks.canPlayerDoubleJump.put(p, true);
-			}
-			if (event.getPlayer().getLocation().getY() <= -5) {
-				if (p != null) {
-					PlayerManager.PlayerFell(p);
-					p.setFallDistance(0f);
-				}
-			}
-		}
-	}
+	// @EventHandler
+	// public void PlayerMoved(PlayerMoveEvent event) {
+	// Player p = event.getPlayer();
+	// if (p.getInventory().getBoots() == null) {
+	// return;
+	// }
+	// if (GameData.PlayersInGame.contains(event.getPlayer())) {
+	// Block b = p.getWorld().getBlockAt(p.getLocation().subtract(0, 1, 0));
+	//
+	// if (KillStreaks.canPlayerDoubleJump.containsKey(p) && KillStreaks.canPlayerDoubleJump.get(p) == false && b.getType() != Material.AIR && p.getVelocity().getY() <= 0) {
+	// KillStreaks.canPlayerDoubleJump.put(p, true);
+	// }
+	// if (event.getPlayer().getLocation().getY() <= -5) {
+	// if (p != null) {
+	// PlayerManager.PlayerFell(p);
+	// p.setFallDistance(0f);
+	// }
+	// }
+	// }
+	// }
 
 	// ********************************** Entity Attacked by Entity ********************************************//
 
@@ -95,7 +97,10 @@ public class EntityListener implements Listener {
 		if (e instanceof Player) {
 			Player p = (Player) event.getEntity();
 			if (GameData.PlayersInGame.contains(p)) { // no damage generally
-
+				if (event.getCause() == DamageCause.VOID) {
+					PlayerManager.PlayerFell(p);
+					p.setFallDistance(0f);
+				}
 				event.setDamage(0);
 
 			}

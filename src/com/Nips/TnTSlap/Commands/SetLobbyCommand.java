@@ -1,12 +1,17 @@
 package com.Nips.TnTSlap.Commands;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.SkullType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import com.Nips.TnTSlap.Config.ArenaConfig;
+import com.Nips.TnTSlap.Stats.Stats;
 import com.Nips.TnTSlap.Utils.GameManager;
 
 public class SetLobbyCommand implements CommandExecutor {
@@ -20,6 +25,7 @@ public class SetLobbyCommand implements CommandExecutor {
 				if (!player.hasPermission("tntslap.set.createmap") && !player.hasPermission("tntslap.set.spawnpoints")) {
 					GameManager.messageTntPlayer(player, ChatColor.RED + "No Perms to do this!");
 				} else {
+					Stats.doit();
 					player.sendMessage(ChatColor.LIGHT_PURPLE + "  ======  " + ChatColor.YELLOW + "" + ChatColor.BOLD + "Arena Commands" + ChatColor.LIGHT_PURPLE + "  ======  ");
 					if (player.hasPermission("tntslap.set.createmap")) {
 						player.sendMessage(ChatColor.LIGHT_PURPLE + "Create:" + ChatColor.YELLOW + " '/arena create <ArenaName>' to create a new arena");
@@ -64,5 +70,16 @@ public class SetLobbyCommand implements CommandExecutor {
 				player.sendMessage(ChatColor.RED + "Try /arena help");
 		}
 		return true;
+	}
+
+	public static ItemStack Skull(String skullOwner, String displayName, int quantity) {
+		ItemStack skull = new ItemStack(Material.SKULL_ITEM, quantity, (short) SkullType.PLAYER.ordinal());
+		SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
+		skullMeta.setOwner(skullOwner);
+		if (displayName != null) {
+			skullMeta.setDisplayName(ChatColor.RESET + displayName);
+		}
+		skull.setItemMeta(skullMeta);
+		return skull;
 	}
 }

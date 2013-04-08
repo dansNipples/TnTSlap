@@ -8,19 +8,19 @@ import java.util.TreeMap;
 import org.bukkit.entity.Player;
 
 public class Stats {
-	private static Map<Player, Integer> OverallWins = new HashMap<Player, Integer>();
-	public static ArrayList<Player> Top3 = new ArrayList<Player>();
+	private static Map<String, Integer> OverallWins = new HashMap<String, Integer>();
+	public static ArrayList<String> Top3 = new ArrayList<String>();
 
 	public static void addWin(Player p) {
-		int i = OverallWins.get(p);
-		if (!OverallWins.containsKey(p)) {
-			OverallWins.put(p, 1);
+		if (!OverallWins.containsKey(p.getName())) {
+			OverallWins.put(p.getName(), 1);
 			return;
 		}
-		OverallWins.put(p, i++);
+		int i = OverallWins.get(p);
+		OverallWins.put(p.getName(), i++);
 	}
 
-	public static Map<Player, Integer> getOverallWins() {
+	public static Map<String, Integer> getOverallWins() {
 		return OverallWins;
 	}
 

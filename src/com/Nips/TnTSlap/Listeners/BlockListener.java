@@ -1,6 +1,7 @@
 package com.Nips.TnTSlap.Listeners;
 
 import org.bukkit.ChatColor;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,7 +18,7 @@ public class BlockListener implements Listener {
 
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
-		if (GameData.PlayersInGame.contains(event.getPlayer())) {
+		if (GameData.isPlaying(event.getPlayer())) {
 			event.setCancelled(true);
 			return;
 		}
@@ -31,18 +32,21 @@ public class BlockListener implements Listener {
 		if (event.getLine(0).equalsIgnoreCase("tntjoin") && player.hasPermission("tntslap.set.signs")) {
 			event.setLine(0, "§a[TNTSLAP]");
 			event.setLine(1, "§nJoin Game");
+			event.setLine(2, ChatColor.UNDERLINE + "" + GameData.getPlayersIngame().size() + "/" + SettingsConfig.getSettingsConfig().getInt("Max_Players"));
 		}
-		if (event.getLine(0).equalsIgnoreCase("tntjoin") && player.hasPermission("tntslap.set.signs")) {
-			event.setLine(0, "§a[TNTSLAP]");
-			event.setLine(1, ChatColor.UNDERLINE + "" + GameData.PlayersInGame.size() + "/" + SettingsConfig.getSettingsConfig().getInt("Max_Players"));
-		}
+	}
+
+	public static void updateJoinSign(Sign s) {
+		s.setLine(0, "§a[TNTSLAP]");
+		s.setLine(1, "§nJoin Game");
+		s.setLine(2, ChatColor.UNDERLINE + "" + GameData.getPlayersIngame().size() + "/" + SettingsConfig.getSettingsConfig().getInt("Max_Players"));
 	}
 
 	// ********************************** Block Placed ********************************************//
 
 	@EventHandler
 	public void BlockPlaced(BlockPlaceEvent event) {
-		if (GameData.PlayersInGame.contains(event.getPlayer())) {
+		if (GameData.isPlaying(event.getPlayer())) {
 			event.setCancelled(true);
 		}
 	}

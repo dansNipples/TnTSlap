@@ -41,7 +41,7 @@ public class TnTSlapCommand implements CommandExecutor {
 				PlayerManager.removePlayerFromGame(player);
 			}
 			if (args[0].equalsIgnoreCase("helpme")) {
-				if (!GameData.PlayersInGame.contains(player)) {
+				if (GameData.isPlaying(player) == false) {
 					if (!player.getInventory().contains(Material.WRITTEN_BOOK)) {
 						player.getInventory().addItem(HelpBookBuilder.BuildBook());
 					}
@@ -76,8 +76,8 @@ public class TnTSlapCommand implements CommandExecutor {
 			}
 			if (args[0].equalsIgnoreCase("check")) {
 				player.sendMessage(ChatColor.AQUA + "   Current Map: " + GameData.getCurrentMap());
-				player.sendMessage(ChatColor.AQUA + "   Game In Session: " + GameData.Started);
-				player.sendMessage(ChatColor.AQUA + "   Players In Game: " + GameData.PlayersInGame.size() + "/" + SettingsConfig.getSettingsConfig().getInt("Max_Players"));
+				player.sendMessage(ChatColor.AQUA + "   Game In Session: " + GameData.getGameState());
+				player.sendMessage(ChatColor.AQUA + "   Players In Game: " + GameData.getPlayersIngame().size() + "/" + SettingsConfig.getSettingsConfig().getInt("Max_Players"));
 			}
 		} else
 			return false;

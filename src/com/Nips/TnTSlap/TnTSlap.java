@@ -53,8 +53,8 @@ public class TnTSlap extends JavaPlugin {
 		config.options().copyDefaults(true);
 		SettingsConfig.saveSettingsConfig();
 
-		if (GameData.CurrentMap == null) {
-			GameData.CurrentMap = GameManager.pickRandomMap();
+		if (GameData.getCurrentMap() == null) {
+			GameData.setCurrentMap(GameManager.pickRandomMap());
 		}
 
 	}
@@ -62,6 +62,6 @@ public class TnTSlap extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		getLogger().info("Disable");
+		GameData.wipeAllData();
 	}
-
 }

@@ -12,7 +12,7 @@ import com.Nips.TnTSlap.Utils.GameData;
 
 public class SpawnFunction {
 	public static void SpawnPlayer(Player p) {
-		String point = grabRandomPoint(GameData.CurrentMap);
+		String point = grabRandomPoint(GameData.getCurrentMap());
 		if (point == null) {
 			p.teleport(p.getWorld().getSpawnLocation());
 			return;
@@ -26,7 +26,7 @@ public class SpawnFunction {
 	}
 
 	public static String grabRandomPoint(String MapName) {
-		if (!ArenaConfig.getArenaConfig().contains(MapName) || GameData.CurrentMap == null) {
+		if (!ArenaConfig.getArenaConfig().contains(MapName) || GameData.getCurrentMap() == null) {
 			return null;
 		}
 

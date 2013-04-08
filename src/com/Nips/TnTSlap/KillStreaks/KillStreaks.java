@@ -13,8 +13,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.WitherSkull;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
@@ -32,8 +30,8 @@ public class KillStreaks {
 		KillStreaks.plugin = plugin;
 	}
 
-	public static Map<Integer, Player> tempwither = new HashMap<Integer, Player>();
-	public static Map<Player, Boolean> canPlayerDoubleJump = new HashMap<Player, Boolean>();
+	// public static Map<Integer, Player> tempwither = new HashMap<Integer, Player>();
+	public static Map<String, Boolean> canPlayerDoubleJump = new HashMap<String, Boolean>();
 
 	public static ItemStack getKillstreak(int killamount) {
 		ItemStack item = new ItemStack(Material.APPLE);
@@ -60,7 +58,7 @@ public class KillStreaks {
 
 	// ********************************** KillStreak Functions ********************************************//
 	public static void activateKillStreak(ItemStack im, Player user) {
-		if (GameData.Started == false) {
+		if (GameData.getGameState() == false) {
 			// if (im.getType() == Material.GOLD_INGOT || im.getType() == Material.RAW_FISH) {
 			// user.sendMessage(ChatColor.GRAY + "Uh oh.. You ate you're weapon!");
 			// user.getInventory().remove(im);
@@ -79,14 +77,14 @@ public class KillStreaks {
 		default:
 			break;
 		}
-		if(im.getAmount() > 1){
+		if (im.getAmount() > 1) {
 			int amount = im.getAmount();
 			int sub = amount - 1;
 			user.getInventory().removeItem(im);
 			im.setAmount(sub);
 			user.getInventory().addItem(im);
 		} else
-		user.getInventory().removeItem(im);
+			user.getInventory().removeItem(im);
 	}
 
 	public static void CheckForKillstreak(Player p, int kills) {
@@ -174,29 +172,30 @@ public class KillStreaks {
 	}
 
 	/*********************************** Wither Bow ********************************************/
-	public static void witherBowShoot(World world, Player attacker, Entity arrow) {
-		attacker.launchProjectile(WitherSkull.class).setVelocity(arrow.getVelocity());
-		tempwither.put(arrow.getEntityId() + 1, attacker);
-	}
-
-	public static void witherBowHit(Projectile head, Entity Attackee) {
-		Player p = (Player) head.getShooter();
-		if (tempwither.containsKey(head.getEntityId())) {
-			p.sendMessage(head.getEntityId() + "");
-			Attackee.getVelocity().setY(2.0);
-		}
-	}
+	// public static void witherBowShoot(World world, Player attacker, Entity arrow) {
+	// attacker.launchProjectile(WitherSkull.class).setVelocity(arrow.getVelocity());
+	// tempwither.put(arrow.getEntityId() + 1, attacker);
+	// }
+	//
+	// public static void witherBowHit(Projectile head, Entity Attackee) {
+	// Player p = (Player) head.getShooter();
+	// if (tempwither.containsKey(head.getEntityId())) {
+	// p.sendMessage(head.getEntityId() + "");
+	// Attackee.getVelocity().setY(2.0);
+	// }
+	// }
 
 	/*********************************** Double Jump ********************************************/
 
 	public static void tryDoubleJump(final Player p) {
 		Vector v2 = p.getLocation().getDirection();
 		v2.setY(1.32);
-		if (canPlayerDoubleJump.containsKey(p) && canPlayerDoubleJump.get(p) == false) {
+		if (canPlayerDoubleJump.containsKey(p.getName()) && canPlayerDoubleJump.get(p.getName()) == false) {
 			return;
+
 		}
 		p.setVelocity(v2);
-		canPlayerDoubleJump.put(p, false);
+		canPlayerDoubleJump.put(p.getName(), false);
 	}
 
 }

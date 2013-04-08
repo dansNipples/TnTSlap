@@ -15,7 +15,6 @@ import com.Nips.TnTSlap.TnTSlap;
 import com.Nips.TnTSlap.Config.ArenaConfig;
 import com.Nips.TnTSlap.Config.SettingsConfig;
 import com.Nips.TnTSlap.Functions.SpawnFunction;
-import com.Nips.TnTSlap.Utils.LeaderBoard.LeaderBoard;
 
 public class GameManager {
 	private static TnTSlap plugin;
@@ -26,36 +25,31 @@ public class GameManager {
 
 	public static void endGame() {
 		GameData.setPvp(false);
-		GameData.setGameSession(false);
-		for (Player p : GameData.PlayersInGame) {
-			GameData.lastToHit.put(p, null);
-			GameData.TotalKills.put(p, 0);
-			GameData.Killstreak.put(p, 0);
-			p.setLevel(0);
-		}
+		GameData.setGameState(false);
+		GameData.resetPlayerMaps();
 		plugin.time.resumeit();
 		resetGame();
 	}
 
 	public static void startGame() {
 		GameData.setPvp(true);
-		GameData.setGameSession(true);
-		GameData.CurrentMap = GameData.NextMap;
-		//LeaderBoard.enableScoreBoard();
+		GameData.setGameState(true);
+		GameData.setCurrentMap(GameData.getNextMap());
+		// LeaderBoard.enableScoreBoard();
 		announceMessage(ChatColor.YELLOW + "Game Starting! First to " + SettingsConfig.getSettingsConfig().getInt("Kills_To_Win") + " kills wins!");
-		for (Player p : GameData.PlayersInGame) {
-			PlayerManager.setupInv(p);
-			SpawnFunction.SpawnPlayer(p);
-			p.setLevel(0);
-			p.setGameMode(GameMode.SURVIVAL);
+		for (String s : GameData.getPlayersIngame()) {
+			PlayerManager.setupInv(Bukkit.getServer().getPlayer(s));
+			SpawnFunction.SpawnPlayer(Bukkit.getServer().getPlayer(s));
+			Bukkit.getServer().getPlayer(s).setLevel(0);
+			Bukkit.getServer().getPlayer(s).setGameMode(GameMode.SURVIVAL);
 		}
 
 	}
 
 	public static void resetGame() {
-		String LastMap = GameData.CurrentMap;
-		GameData.NextMap = pickRandomMap();
-		Bukkit.getServer().broadcastMessage(ChatColor.RED + "[TntSlap] " + ChatColor.LIGHT_PURPLE + "New Game in 30s. Next Map will be: " + ChatColor.YELLOW + "'" + GameData.NextMap + "'");
+		String LastMap = GameData.getCurrentMap();
+		GameData.setNextMap(pickRandomMap());
+		Bukkit.getServer().broadcastMessage(ChatColor.RED + "[TntSlap] " + ChatColor.LIGHT_PURPLE + "New Game in 30s. Next Map will be: " + ChatColor.YELLOW + "'" + GameData.getNextMap() + "'");
 		new BukkitRunnable() {
 			public void run() {
 				startGame();
@@ -66,8 +60,8 @@ public class GameManager {
 	public static String pickRandomMap() {
 		Set<String> maps = ArenaConfig.getArenaConfig().getKeys(false);
 		List<String> mapss = new ArrayList<String>();
-		if(GameData.CurrentMap != null){
-			mapss.remove(GameData.CurrentMap);
+		if (GameData.getCurrentMap() != null) {
+			mapss.remove(GameData.getCurrentMap());
 		}
 		mapss.addAll(maps);
 		Random rand = new Random();
@@ -81,13 +75,13 @@ public class GameManager {
 			messageTntPlayer(p, ChatColor.YELLOW + "No such map. Names are case sensative");
 			return;
 		}
-		GameData.NextMap = s;
+		GameData.setNextMap(s);
 		messageTntPlayer(p, ChatColor.YELLOW + "Next map set to: " + s);
 	}
 
 	public static void announceMessage(String s) {
-		for (Player p : GameData.getPlayersInGame()) {
-			p.sendMessage(ChatColor.RED + "[TntSlap] " + s);
+		for (String i : GameData.getPlayersIngame()) {
+			Bukkit.getServer().getPlayer(i).sendMessage(ChatColor.RED + "[TntSlap] " + s);
 		}
 	}
 

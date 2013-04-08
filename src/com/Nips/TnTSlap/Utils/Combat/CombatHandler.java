@@ -12,7 +12,7 @@ import com.Nips.TnTSlap.Utils.PlayerManager;
 public class CombatHandler {
 
 	public static void playerHit(Player attacker, Player defender, ItemStack attackingItem) {
-		if (GameData.Pvp == false) {
+		if (!GameData.getGameState()) {
 			return;
 		}
 		int x = 1 + (int) (Math.random() * ((4 - 1) + 1));

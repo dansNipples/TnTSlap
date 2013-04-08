@@ -7,7 +7,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.craftbukkit.v1_5_R2.entity.CraftEntity;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -17,14 +16,12 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.Nips.TnTSlap.KillStreaks.KillStreaks;
@@ -37,28 +34,26 @@ public class EntityListener implements Listener {
 
 	// ********************************** Player Moved ********************************************//
 
-	/** COULD BE CAUSING MEMORY LEAK **/
+	@EventHandler
+	public void PlayerMoved(PlayerMoveEvent event) {
+		Player p = event.getPlayer();
+		// if (p.getInventory().getBoots() == null) {
+		// return;
+		// }
+		if (GameData.isPlaying(p)) {
+			Block b = p.getWorld().getBlockAt(p.getLocation().subtract(0, 1, 0));
 
-	// @EventHandler
-	// public void PlayerMoved(PlayerMoveEvent event) {
-	// Player p = event.getPlayer();
-	// if (p.getInventory().getBoots() == null) {
-	// return;
-	// }
-	// if (GameData.PlayersInGame.contains(event.getPlayer())) {
-	// Block b = p.getWorld().getBlockAt(p.getLocation().subtract(0, 1, 0));
-	//
-	// if (KillStreaks.canPlayerDoubleJump.containsKey(p) && KillStreaks.canPlayerDoubleJump.get(p) == false && b.getType() != Material.AIR && p.getVelocity().getY() <= 0) {
-	// KillStreaks.canPlayerDoubleJump.put(p, true);
-	// }
-	// if (event.getPlayer().getLocation().getY() <= -5) {
-	// if (p != null) {
-	// PlayerManager.PlayerFell(p);
-	// p.setFallDistance(0f);
-	// }
-	// }
-	// }
-	// }
+			if (KillStreaks.canPlayerDoubleJump.containsKey(p.getName()) && KillStreaks.canPlayerDoubleJump.get(p.getName()) == false && b.getType() != Material.AIR && p.getVelocity().getY() <= 0) {
+				KillStreaks.canPlayerDoubleJump.put(p.getName(), true);
+			}
+			// if (event.getPlayer().getLocation().getY() <= -5) {
+			// if (p != null) {
+			// PlayerManager.PlayerFell(p);
+			// p.setFallDistance(0f);
+			// }
+			// }
+		}
+	}
 
 	// ********************************** Entity Attacked by Entity ********************************************//
 
@@ -68,10 +63,10 @@ public class EntityListener implements Listener {
 		if (event.getEntityType() == EntityType.PLAYER && event.getDamager().getType() == EntityType.PLAYER) {
 			Player p = (Player) event.getEntity();
 			Player p2 = (Player) event.getDamager();
-			if (GameData.PlayersInGame.contains(p) && GameData.PlayersInGame.contains(p2)) {
+			if (GameData.isPlaying(p) && GameData.isPlaying(p2)) {
 				CraftEntity cEntity = (CraftEntity) p;
 				EntityLiving entity = (EntityLiving) cEntity.getHandle();
-				if (GameData.Pvp == false || GameData.Started == false) {
+				if (GameData.isPvp() == false || GameData.getGameState() == false) {
 					event.setCancelled(true);
 					return;
 				}
@@ -85,7 +80,9 @@ public class EntityListener implements Listener {
 
 				}
 				event.setCancelled(true);
-			}
+			} else
+				event.setCancelled(true);
+
 		}
 	}
 
@@ -96,7 +93,7 @@ public class EntityListener implements Listener {
 		Entity e = event.getEntity();
 		if (e instanceof Player) {
 			Player p = (Player) event.getEntity();
-			if (GameData.PlayersInGame.contains(p)) { // no damage generally
+			if (GameData.isPlaying(p)) { // no damage generally
 				if (event.getCause() == DamageCause.VOID) {
 					PlayerManager.PlayerFell(p);
 					p.setFallDistance(0f);
@@ -113,7 +110,7 @@ public class EntityListener implements Listener {
 	@EventHandler
 	public void itemRightClick(PlayerInteractEvent event) {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			if (GameData.PlayersInGame.contains(event.getPlayer())) {
+			if (GameData.isPlaying(event.getPlayer())) {
 				if (event.getPlayer().getItemInHand().getType() != Material.AIR) {
 					if (event.getItem().getType() == Material.GOLD_INGOT) {
 						KillStreaks.tryDoubleJump(event.getPlayer());
@@ -136,6 +133,7 @@ public class EntityListener implements Listener {
 				if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 					if (sign.getLine(0).equals("§a[TNTSLAP]") && sign.getLine(1).equals("§nJoin Game")) {
 						PlayerManager.addPlayerToGame(player);
+						BlockListener.updateJoinSign(sign);
 					}
 				}
 
@@ -148,8 +146,8 @@ public class EntityListener implements Listener {
 	@EventHandler
 	public void dropItem(PlayerDropItemEvent event) {
 		Player p = event.getPlayer();
-		if (!GameData.PlayersInGame.contains(p)) {
-			if (event.getItemDrop().getItemStack().getType() == Material.WRITTEN_BOOK || event.getItemDrop().getItemStack().getType() == Material.GOLD_BOOTS) {
+		if (GameData.isPlaying(p)) {
+			if (event.getItemDrop().getItemStack().getType() == Material.WRITTEN_BOOK || event.getItemDrop().getItemStack().getType() == Material.GOLD_BOOTS || event.getItemDrop().getItemStack().getType() == Material.CHAINMAIL_BOOTS) {
 				event.setCancelled(true);
 			}
 		} else
@@ -158,28 +156,28 @@ public class EntityListener implements Listener {
 
 	// ********************************** Projectile Launched ********************************************//
 
-	@EventHandler
-	public void onShoot(ProjectileLaunchEvent event) {
-		if (event.getEntity() instanceof Arrow) {
-			Arrow arrow = (Arrow) event.getEntity();
-			if (arrow.getShooter() instanceof Player) {
-				Player shooter = (Player) arrow.getShooter();
-				if (shooter.getItemInHand().getType() == Material.BOW && GameData.PlayersInGame.contains(shooter)) {
-					event.setCancelled(true);
-					KillStreaks.witherBowShoot(shooter.getWorld(), shooter, arrow);
-				}
-			}
-		}
-	}
-
-	/** ONE DAY... **/
-	@EventHandler
-	public void onProjectileHit(ProjectileHitEvent event) {
-		Player p = (Player) event.getEntity().getShooter();
-		p.sendMessage("" + event.getEntity().getEntityId());
-		// KillStreaks.witherBowHit(event.getEntity());
-
-	}
+	// @EventHandler
+	// public void onShoot(ProjectileLaunchEvent event) {
+	// if (event.getEntity() instanceof Arrow) {
+	// Arrow arrow = (Arrow) event.getEntity();
+	// if (arrow.getShooter() instanceof Player) {
+	// Player shooter = (Player) arrow.getShooter();
+	// if (shooter.getItemInHand().getType() == Material.BOW && GameData.PlayersInGame.contains(shooter)) {
+	// event.setCancelled(true);
+	// KillStreaks.witherBowShoot(shooter.getWorld(), shooter, arrow);
+	// }
+	// }
+	// }
+	// }
+	//
+	// /** ONE DAY... **/
+	// @EventHandler
+	// public void onProjectileHit(ProjectileHitEvent event) {
+	// Player p = (Player) event.getEntity().getShooter();
+	// p.sendMessage("" + event.getEntity().getEntityId());
+	// KillStreaks.witherBowHit(event.getEntity());
+	//
+	// }
 
 	// @EventHandler
 	// public void EntityShoot(EntityShootBowEvent event) {
@@ -195,7 +193,7 @@ public class EntityListener implements Listener {
 
 	@EventHandler
 	public void playerQuit(PlayerQuitEvent event) {
-		if (GameData.PlayersInGame.contains(event.getPlayer())) {
+		if (GameData.isPlaying(event.getPlayer())) {
 			PlayerManager.removePlayerFromGame(event.getPlayer());
 		}
 
@@ -204,7 +202,7 @@ public class EntityListener implements Listener {
 	// ********************************** Command Send ********************************************//
 	@EventHandler
 	public void sendCommanddd(PlayerCommandPreprocessEvent event) {
-		if (GameData.PlayersInGame.contains(event.getPlayer())) {
+		if (GameData.isPlaying(event.getPlayer())) {
 			if (event.getPlayer().hasPermission("tntslap.bypass.nocommands")) {
 				return;
 			}
@@ -224,15 +222,6 @@ public class EntityListener implements Listener {
 			p.setSaturation(20.0f);
 			event.setCancelled(true);
 		}
-	}
-
-	// ********************************** Entity Explode ********************************************//
-
-	@EventHandler
-	public void entityExplode(EntityExplodeEvent event) {
-		// if (event.getEntityType() == EntityType.WITHER_SKULL && KillStreaks.tempwither.containsKey(event.getEntity().getEntityId())) {
-		// event.setCancelled(true);
-		// }
 	}
 
 }

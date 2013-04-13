@@ -223,7 +223,7 @@ public class GameData {
 		}
 		if (lastToHit.containsKey(p.getName()) || lastToHit.containsValue(p.getName())) {
 			lastToHit.remove(p.getName());
-			// remove his last to hit here
+
 		}
 	}
 
@@ -239,7 +239,7 @@ public class GameData {
 		}
 		if (!lastToHit.containsKey(p.getName())) {
 			lastToHit.put(p.getName(), null);
-			// remove his last to hit here
+
 		}
 	}
 

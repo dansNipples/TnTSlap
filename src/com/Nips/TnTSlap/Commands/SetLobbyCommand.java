@@ -11,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import com.Nips.TnTSlap.Config.ArenaConfig;
-import com.Nips.TnTSlap.Stats.Stats;
 import com.Nips.TnTSlap.Utils.GameManager;
 
 public class SetLobbyCommand implements CommandExecutor {
@@ -25,7 +24,6 @@ public class SetLobbyCommand implements CommandExecutor {
 				if (!player.hasPermission("tntslap.set.createmap") && !player.hasPermission("tntslap.set.spawnpoints")) {
 					GameManager.messageTntPlayer(player, ChatColor.RED + "No Perms to do this!");
 				} else {
-					Stats.doit();
 					player.sendMessage(ChatColor.LIGHT_PURPLE + "  ======  " + ChatColor.YELLOW + "" + ChatColor.BOLD + "Arena Commands" + ChatColor.LIGHT_PURPLE + "  ======  ");
 					if (player.hasPermission("tntslap.set.createmap")) {
 						player.sendMessage(ChatColor.LIGHT_PURPLE + "Create:" + ChatColor.YELLOW + " '/arena create <ArenaName>' to create a new arena");

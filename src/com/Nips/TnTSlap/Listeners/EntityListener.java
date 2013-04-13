@@ -25,6 +25,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.Nips.TnTSlap.KillStreaks.KillStreaks;
+import com.Nips.TnTSlap.Stats.Stats;
 import com.Nips.TnTSlap.Utils.GameData;
 import com.Nips.TnTSlap.Utils.GameManager;
 import com.Nips.TnTSlap.Utils.PlayerManager;
@@ -134,7 +135,19 @@ public class EntityListener implements Listener {
 					if (sign.getLine(0).equals("§a[TNTSLAP]") && sign.getLine(1).equals("§nJoin Game")) {
 						PlayerManager.addPlayerToGame(player);
 						BlockListener.updateJoinSign(sign);
+					} else if (sign.getLine(0).equals("§a[TNT STATS]")) {
+						sign.setLine(1, event.getPlayer().getDisplayName());
+						sign.setLine(2, "Wins: " + Stats.getPlayerWins(player));
+						sign.setLine(3, "Rank: " + Stats.getPlayerRank(player) + "/" + Stats.getRankList().size());
+						sign.update();
+						Stats.organizeRanks();
+					} else if (sign.getLine(0).equals("§a[Top 3]")) {
+						sign.setLine(1, "#1 " + Stats.getPlayerAtRank(1));
+						sign.setLine(2, "#2 " + Stats.getPlayerAtRank(2));
+						sign.setLine(3, "#3 " + Stats.getPlayerAtRank(3));
+						sign.update();
 					}
+
 				}
 
 			}

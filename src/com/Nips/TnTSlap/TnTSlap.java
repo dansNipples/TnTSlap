@@ -8,8 +8,10 @@ import com.Nips.TnTSlap.Commands.SetLobbyCommand;
 import com.Nips.TnTSlap.Commands.TnTSlapCommand;
 import com.Nips.TnTSlap.Config.ArenaConfig;
 import com.Nips.TnTSlap.Config.SettingsConfig;
+import com.Nips.TnTSlap.Config.StatsFile;
 import com.Nips.TnTSlap.Listeners.BlockListener;
 import com.Nips.TnTSlap.Listeners.EntityListener;
+import com.Nips.TnTSlap.Stats.Stats;
 import com.Nips.TnTSlap.Utils.GameData;
 import com.Nips.TnTSlap.Utils.GameManager;
 import com.Nips.TnTSlap.Utils.PlayerManager;
@@ -28,6 +30,7 @@ public class TnTSlap extends JavaPlugin {
 	/** Config **/
 	ArenaConfig arenaconfig = new ArenaConfig(this);
 	SettingsConfig settingsconfig = new SettingsConfig(this);
+	StatsFile stats = new StatsFile(this);
 
 	@Override
 	public void onEnable() {
@@ -56,6 +59,7 @@ public class TnTSlap extends JavaPlugin {
 		if (GameData.getCurrentMap() == null) {
 			GameData.setCurrentMap(GameManager.pickRandomMap());
 		}
+		Stats.organizeRanks();
 
 	}
 
@@ -63,5 +67,6 @@ public class TnTSlap extends JavaPlugin {
 	public void onDisable() {
 		getLogger().info("Disable");
 		GameData.wipeAllData();
+		Stats.organizeRanks();
 	}
 }

@@ -1,6 +1,5 @@
 package com.Nips.TnTSlap.Utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,7 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class GameData {
-	private static ArrayList<String> PlayersInGame = new ArrayList<String>();
+	private static Map<String, Boolean> PlayersInGame = new HashMap<String, Boolean>();
 	private static Map<String, Integer> Points = new HashMap<String, Integer>(); // this was TotalKills
 	private static Map<String, Integer> Killstreak = new HashMap<String, Integer>();
 	private static Map<String, String> lastToHit = new HashMap<String, String>();
@@ -19,7 +18,7 @@ public class GameData {
 
 	/** Players In Game **/
 	public static boolean isPlaying(Player p) {
-		if (PlayersInGame.contains(p.getName())) {
+		if (PlayersInGame.containsKey(p.getName())) {
 			return true;
 		}
 		return false;
@@ -30,7 +29,7 @@ public class GameData {
 			GameManager.messageTntPlayer(p, ChatColor.YELLOW + "You are already in the game!");
 			return;
 		}
-		PlayersInGame.add(p.getName());
+		PlayersInGame.put(p.getName(), true);
 	}
 
 	public static void removeFromGame(Player p) {
@@ -38,16 +37,16 @@ public class GameData {
 			GameManager.messageTntPlayer(p, ChatColor.YELLOW + "You are not in the game!");
 			return;
 		}
-		PlayersInGame.add(p.getName());
+		PlayersInGame.remove(p.getName());
 	}
 
 	public static void removeAllInGame() {
-		for (String s : PlayersInGame) {
+		for (String s : PlayersInGame.keySet()) {
 			PlayersInGame.remove(s);
 		}
 	}
 
-	public static ArrayList<String> getPlayersIngame() {
+	public static Map<String, Boolean> getPlayersIngame() {
 		return PlayersInGame;
 	}
 
@@ -212,7 +211,7 @@ public class GameData {
 	}
 
 	public static void removeFromMaps(Player p) {
-		if (PlayersInGame.contains(p.getName())) {
+		if (PlayersInGame.containsKey(p.getName())) {
 			PlayersInGame.remove(p.getName());
 		}
 		if (Points.containsKey(p.getName())) {
@@ -228,8 +227,8 @@ public class GameData {
 	}
 
 	public static void addToMaps(Player p) {
-		if (!PlayersInGame.contains(p.getName())) {
-			PlayersInGame.add(p.getName());
+		if (!PlayersInGame.containsKey(p.getName())) {
+			PlayersInGame.put(p.getName(), true);
 		}
 		if (!Points.containsKey(p.getName())) {
 			Points.put(p.getName(), 0);
@@ -244,7 +243,7 @@ public class GameData {
 	}
 
 	public static void resetPlayerMaps() {
-		for (String s : PlayersInGame) {
+		for (String s : PlayersInGame.keySet()) {
 			Points.put(s, 0);
 			Killstreak.put(s, 0);
 			lastToHit.put(s, null);

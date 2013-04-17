@@ -37,7 +37,7 @@ public class GameManager {
 		GameData.setCurrentMap(GameData.getNextMap());
 		// LeaderBoard.enableScoreBoard();
 		announceMessage(ChatColor.YELLOW + "Game Starting! First to " + SettingsConfig.getSettingsConfig().getInt("Kills_To_Win") + " kills wins!");
-		for (String s : GameData.getPlayersIngame()) {
+		for (String s : GameData.getPlayersIngame().keySet()) {
 			PlayerManager.setupInv(Bukkit.getServer().getPlayer(s));
 			SpawnFunction.SpawnPlayer(Bukkit.getServer().getPlayer(s));
 			Bukkit.getServer().getPlayer(s).setLevel(0);
@@ -80,7 +80,7 @@ public class GameManager {
 	}
 
 	public static void announceMessage(String s) {
-		for (String i : GameData.getPlayersIngame()) {
+		for (String i : GameData.getPlayersIngame().keySet()) {
 			Bukkit.getServer().getPlayer(i).sendMessage(ChatColor.RED + "[TntSlap] " + s);
 		}
 	}

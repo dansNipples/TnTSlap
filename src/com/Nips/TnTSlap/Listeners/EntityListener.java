@@ -64,6 +64,9 @@ public class EntityListener implements Listener {
 		if (event.getEntityType() == EntityType.PLAYER && event.getDamager().getType() == EntityType.PLAYER) {
 			Player p = (Player) event.getEntity();
 			Player p2 = (Player) event.getDamager();
+			if (GameData.isPlaying(p) == false && GameData.isPlaying(p2) == false) {
+				event.setCancelled(true);
+			}
 			if (GameData.isPlaying(p) && GameData.isPlaying(p2)) {
 				CraftEntity cEntity = (CraftEntity) p;
 				EntityLiving entity = (EntityLiving) cEntity.getHandle();
@@ -136,7 +139,15 @@ public class EntityListener implements Listener {
 						PlayerManager.addPlayerToGame(player);
 						BlockListener.updateJoinSign(sign);
 					} else if (sign.getLine(0).equals("§a[TNT STATS]")) {
+						String rank = Stats.getPlayerRank(player);
 						sign.setLine(1, event.getPlayer().getDisplayName());
+						if (rank == "No Rank") {
+							sign.setLine(2, "No wins. Noob");
+							sign.setLine(3, "Try Harder.");
+							sign.update();
+							Stats.organizeRanks();
+							return;
+						}
 						sign.setLine(2, "Wins: " + Stats.getPlayerWins(player));
 						sign.setLine(3, "Rank: " + Stats.getPlayerRank(player) + "/" + Stats.getRankList().size());
 						sign.update();

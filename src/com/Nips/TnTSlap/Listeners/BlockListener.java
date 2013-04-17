@@ -23,6 +23,9 @@ public class BlockListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
+		if (!event.getPlayer().isOp()) {
+			event.setCancelled(true);
+		}
 	}
 
 	// ********************************** Sign Changed ********************************************//
@@ -59,6 +62,9 @@ public class BlockListener implements Listener {
 	@EventHandler
 	public void BlockPlaced(BlockPlaceEvent event) {
 		if (GameData.isPlaying(event.getPlayer())) {
+			event.setCancelled(true);
+		}
+		if (!event.getPlayer().isOp()) {
 			event.setCancelled(true);
 		}
 	}
